@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "482653876299",
+    "firebase_url": "https://friendat-92dfd.firebaseio.com",
+    "project_id": "friendat-92dfd",
+    "storage_bucket": "friendat-92dfd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482653876299:android:f38fbdf03d2e32cf",
+        "android_client_info": {
+          "package_name": "com.example.diaaldinkr.friendat2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482653876299-jiftv38l8rnvit5mj8frpnp73hefnvdh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.diaaldinkr.friendat2",
+            "certificate_hash": "1d067c9230c97a22f8cebeef08a5d848c774effd"
+          }
+        },
+        {
+          "client_id": "482653876299-n6qtbn9evk08e86gde758kcb1sufh91i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwjN2e9vtocAqE22HX3CqDPJ9N8mHtCKY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482653876299-n6qtbn9evk08e86gde758kcb1sufh91i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
