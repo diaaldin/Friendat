@@ -110,7 +110,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="23dp"
-                android:text="pr login using your"
+                android:text="or login using your"
                 android:textAlignment="center"
                 android:textSize="17sp"
                 android:textStyle="bold"/>
@@ -126,7 +126,7 @@
                 android:layout_marginRight="19dp"
                 android:text="phone"
                 android:textAllCaps="false"
-                android:textSize="14sp"
+                android:textSize="24sp"
                 android:textColor="@android:color/background_light"
                 android:background="@drawable/buttons"
                 android:drawableStart="@drawable/phone"/>

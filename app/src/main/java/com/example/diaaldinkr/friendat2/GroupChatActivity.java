@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class GroupChatActivity extends AppCompatActivity {
 
@@ -57,6 +59,7 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 saveMessage();
                 userMessageInput.setText("");
+                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
@@ -92,6 +95,59 @@ public class GroupChatActivity extends AppCompatActivity {
                 messageInfoMap.put("time",currentTime);
             groupMessageKeyRef.updateChildren(messageInfoMap);
 
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        groupNameRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(dataSnapshot.exists()){
+                    //if the group exists and display the messages
+                    DisplayMessages(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if(dataSnapshot.exists()){
+                    //if the group exists and display the messages
+                    DisplayMessages(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void DisplayMessages(DataSnapshot dataSnapshot) {
+//retrieve and display all the messages
+        Iterator iter = dataSnapshot.getChildren().iterator();
+        while (iter.hasNext()){
+            String chatDate = (String)((DataSnapshot)iter.next()).getValue();
+            //Here i had to dicript the message
+            String chatMessage = (String)((DataSnapshot)iter.next()).getValue();
+            String chatName = (String)((DataSnapshot)iter.next()).getValue();
+            String chatTime = (String)((DataSnapshot)iter.next()).getValue();
+
+            displayTextMessage.append(chatName + ": \n"+ chatMessage + "\n"+chatTime+"      "+chatDate+"\n\n\n");
+
+            mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
         }
     }
 
