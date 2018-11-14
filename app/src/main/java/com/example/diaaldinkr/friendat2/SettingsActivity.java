@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,9 +36,10 @@ public class SettingsActivity extends AppCompatActivity {
     private Button updateAccountSettings;
     private EditText userName , userStatus;
     private CircleImageView userProfileImage;
-    private String currintUserID;
+    private String currentUserID;
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
+    private Toolbar mToolbar;
     private  static final  int galleryPick=1 ;
     private StorageReference userProfileImagesRef;
     private ProgressDialog loadingBar;
@@ -48,7 +49,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         mAuth = FirebaseAuth.getInstance();
-        currintUserID = mAuth.getCurrentUser().getUid();
+        currentUserID = mAuth.getCurrentUser().getUid();
         rootRef = FirebaseDatabase.getInstance().getReference();
         userProfileImagesRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
 
@@ -82,6 +83,12 @@ public class SettingsActivity extends AppCompatActivity {
         userStatus = findViewById(R.id.set_profile_status);
         userProfileImage = findViewById(R.id.set_profile_image);
         loadingBar =new ProgressDialog(this);
+
+        mToolbar = findViewById(R.id.settings_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setTitle("Settings");
     }
 
     @Override
@@ -107,7 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
                 //resultUri is contain the cropped image
                 Uri resultUri = result.getUri();
                 //store the image inside the firebase storage
-                StorageReference filePath = userProfileImagesRef.child(currintUserID + ".jpg");
+                StorageReference filePath = userProfileImagesRef.child(currentUserID + ".jpg");
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -115,7 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
                             Toast.makeText(SettingsActivity.this, "Profile image uploaded successfully", Toast.LENGTH_SHORT).show();
                             //get the link of the profile image from the storage and store the link in the database
                             final  String downloadUri = task.getResult().getDownloadUrl().toString();
-                            rootRef.child("Users").child(currintUserID).child("image").setValue(downloadUri)
+                            rootRef.child("Users").child(currentUserID).child("image").setValue(downloadUri)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
@@ -155,12 +162,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
         else{
             //saving the data in the database
-            HashMap<String,String> profileMap = new HashMap<>();
-                profileMap.put("uid",currintUserID);
+            HashMap<String,Object> profileMap = new HashMap<>();
+                profileMap.put("uid",currentUserID);
                 profileMap.put("name",setUserName);
                 profileMap.put("status",setStatus);
                 //save the data in the user child
-            rootRef.child("Users").child(currintUserID).setValue(profileMap)
+            rootRef.child("Users").child(currentUserID).updateChildren(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -178,20 +185,20 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void retrieveUserInfo() {
-        rootRef.child("Users").child(currintUserID)
+        rootRef.child("Users").child(currentUserID)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         //if the user exist and he update the name and the status and the image
                         if(dataSnapshot.exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("image")){
                             //display the information
-                            String retriveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retriveStatus = dataSnapshot.child("status").getValue().toString();
-                            String retriveProfileImage = dataSnapshot.child("image").getValue().toString();
+                            String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                            String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+                            String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
 
-                            userName.setText(retriveUserName);
-                            userStatus.setText(retriveStatus);
-                            Picasso.get().load(retriveProfileImage).into(userProfileImage);
+                            userName.setText(retrieveUserName);
+                            userStatus.setText(retrieveStatus);
+                            Picasso.get().load(retrieveProfileImage).into(userProfileImage);
 
                         }
                         //if the user exist and he update the name and the status

@@ -183,8 +183,6 @@ public class MainActivity extends AppCompatActivity {
     }
     private void sendUserToSettingsActivity() {
         Intent settingsIntent = new Intent(MainActivity.this,SettingsActivity.class);
-        //to prevent the user from going back if he click on back button
-        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(settingsIntent);
     }
 }

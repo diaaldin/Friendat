@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -36,11 +35,11 @@ public class FindFriendsActivity extends AppCompatActivity {
         findFriendsRecyclerList=findViewById(R.id.find_friends_Recycler_list);
         findFriendsRecyclerList.setLayoutManager(new LinearLayoutManager(this));
 
-        mToolbar= findViewById(R.id.find_friends_toolbar);
+        mToolbar = findViewById(R.id.find_friends_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Find Friend");
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setTitle("Find friend");
 
     }
     @Override
