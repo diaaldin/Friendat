@@ -24,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -61,7 +62,6 @@ rootRef = FirebaseDatabase.getInstance().getReference();
         messageReceiverImage = getIntent().getExtras().get("visit_user_image").toString();
 
         initializeControllers();
-
         userName.setText(messageReceiverName);
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
 
@@ -136,9 +136,37 @@ rootRef = FirebaseDatabase.getInstance().getReference();
         userMessagesList.setAdapter(messageAdapter);
     }
 
+    private void displayLastSeen(){
+        rootRef.child("Users").child(messageSenderID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //retrieve the last seen, the date and the time
+                if(dataSnapshot.child("user_state").hasChild("state")){
+                    String state = dataSnapshot.child("user_state").child("state").getValue().toString();
+                    String date = dataSnapshot.child("user_state").child("date").getValue().toString();
+                    String time = dataSnapshot.child("user_state").child("time").getValue().toString();
+
+                    if(state.equals("online")){
+                        lastSeen.setText("online");
+                    }else if(state.equals("offline")){
+                        lastSeen.setText("Last Seen: "+date+ " "+ time);
+                    }
+
+                }else{
+                    lastSeen.setText("offline");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
     @Override
     protected void onStart() {
         super.onStart();
+        displayLastSeen();
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override

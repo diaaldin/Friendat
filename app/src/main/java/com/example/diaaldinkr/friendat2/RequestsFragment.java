@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,9 +89,7 @@ public class RequestsFragment extends Fragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(dataSnapshot.exists()) {
                                     String type = dataSnapshot.getValue().toString();
-                                    Log.d("1 >>>>>>>>>", "onDataChange: Im here "+type);
                                     if (type.equals("received")) {
-                                        Log.d("2 >>>>>>>>>", "onDataChange: Im here " + type);
                                         usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -182,6 +179,57 @@ public class RequestsFragment extends Fragment {
 
                                             }
                                         });
+                                    }else if(type.equals("sent")){
+                                        Button requestSentBtn = holder.itemView.findViewById(R.id.request_decline_button);
+                                        requestSentBtn.setText("Cancel chat request");
+                                        holder.itemView.findViewById(R.id.request_accept_button).setVisibility(View.GONE);
+
+                                        usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                if (dataSnapshot.hasChild("image")) {
+                                                    final String requestUserImage = dataSnapshot.child("image").getValue().toString();
+                                                    Picasso.get().load(requestUserImage).into(holder.profileImage);
+                                                }
+                                                final String profileName = dataSnapshot.child("name").getValue().toString();
+
+                                                holder.userName.setText(profileName);
+                                                holder.userStatus.setText("  ");
+                                                //here add listener to the cancel button
+                                                holder.declineButton.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        //if the user click on cancel button
+                                                        chatRequestsRef.child(currentUserID).child(list_user_id)
+                                                                .removeValue()
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if(task.isSuccessful()){
+                                                                            chatRequestsRef.child(list_user_id).child(currentUserID)
+                                                                                    .removeValue()
+                                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                            if(task.isSuccessful()){
+                                                                                                Toast.makeText(getContext(), " request canceled", Toast.LENGTH_SHORT).show();
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                        }
+                                                                    }
+                                                                });
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        });
+
                                     }
                                 }
                             }
