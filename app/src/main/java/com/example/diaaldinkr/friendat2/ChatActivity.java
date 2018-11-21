@@ -3,6 +3,7 @@ package com.example.diaaldinkr.friendat2;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,7 +40,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView userName, lastSeen;
     private CircleImageView userImage;
     private Toolbar chatToolBar;
-    private ImageButton sendMessageButton;
+    private FloatingActionButton sendMessageButton;
     private EditText messageInput;
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
@@ -56,7 +57,7 @@ public class ChatActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
-rootRef = FirebaseDatabase.getInstance().getReference();
+        rootRef = FirebaseDatabase.getInstance().getReference();
         messageReceiverID = getIntent().getExtras().get("visit_user_id").toString();
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = getIntent().getExtras().get("visit_user_image").toString();
@@ -71,6 +72,38 @@ rootRef = FirebaseDatabase.getInstance().getReference();
                 sendMessage();
             }
         });
+        rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Messages messages = dataSnapshot.getValue(Messages.class);
+                        messagesList.add(messages);
+                        messageAdapter.notifyDataSetChanged();
+//                        userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+                        userMessagesList.setAdapter(messageAdapter);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
     }
 
     private void sendMessage() {
@@ -99,12 +132,12 @@ rootRef = FirebaseDatabase.getInstance().getReference();
             rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
+                    messageInput.setText("");
                     if(task.isSuccessful()){
                         Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
-                    messageInput.setText("");
                 }
             });
 
@@ -133,7 +166,15 @@ rootRef = FirebaseDatabase.getInstance().getReference();
         messageAdapter = new MessageAdapter(messagesList);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
-        userMessagesList.setAdapter(messageAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        displayLastSeen();
+        linearLayoutManager.setStackFromEnd(true);
+//        userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+
     }
 
     private void displayLastSeen(){
@@ -162,42 +203,5 @@ rootRef = FirebaseDatabase.getInstance().getReference();
 
             }
         });
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayLastSeen();
-        rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Messages messages = dataSnapshot.getValue(Messages.class);
-                        messagesList.add(messages);
-                        messageAdapter.notifyDataSetChanged();
-                        //add automatic scroll to the list
-                        userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
     }
 }
