@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +27,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +105,7 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
+
     }
 
     private void sendMessage() {
@@ -119,11 +121,16 @@ public class ChatActivity extends AppCompatActivity {
             //this key used to store the messages
             String messagePushID = userMessageKeyRef.getKey();
 
+            String saveCurrentTime;
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+            saveCurrentTime = currentTime.format(calendar.getTime());
             Map messageTextBody = new HashMap();
             messageTextBody.put("message",messageText);
             //this is the message type and the text for just text messages i had to add another types
             messageTextBody.put("type","text");
             messageTextBody.put("from",messageSenderID);
+            messageTextBody.put("time",saveCurrentTime);
 
             Map messageBodyDetails= new HashMap();
             messageBodyDetails.put(messageSenderRef + "/"+ messagePushID , messageTextBody);

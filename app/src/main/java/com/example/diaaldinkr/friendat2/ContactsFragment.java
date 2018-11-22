@@ -82,13 +82,13 @@ public class ContactsFragment extends Fragment {
                                 String time = dataSnapshot.child("user_state").child("time").getValue().toString();
 
                                 if(state.equals("online")){
-                                    holder.onlineIcone.setVisibility(View.VISIBLE);
+                                    holder.onlineIcon.setVisibility(View.VISIBLE);
                                 }else if(state.equals("offline")){
-                                    holder.onlineIcone.setVisibility(View.INVISIBLE);
+                                    holder.onlineIcon.setVisibility(View.INVISIBLE);
                                 }
 
                             }else{
-                                holder.onlineIcone.setVisibility(View.INVISIBLE);
+                                holder.onlineIcon.setVisibility(View.INVISIBLE);
                             }
 
                             if(dataSnapshot.hasChild("image")){
@@ -133,14 +133,14 @@ public class ContactsFragment extends Fragment {
     public static class ContactsViewHolder extends RecyclerView.ViewHolder {
         TextView userName, userStatus;
         CircleImageView profileImage;
-        ImageView onlineIcone;
+        ImageView onlineIcon;
 
         public ContactsViewHolder(@NonNull View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.user_profile_name);
             userStatus = itemView.findViewById(R.id.user_status);
             profileImage = itemView.findViewById(R.id.user_profile_image);
-            onlineIcone = itemView.findViewById(R.id.user_online_status);
+            onlineIcon = itemView.findViewById(R.id.user_online_status);
         }
     }
 }

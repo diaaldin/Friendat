@@ -2,12 +2,12 @@ package com.example.diaaldinkr.friendat2;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -71,31 +71,31 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             updateUserStatus("online");
-            VerifyUserExistance();
+            VerifyUserExistence();
         }
     }
-/*
+
     @Override
     protected void onStop() {
         super.onStop();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
-            updateUserStatus("offline");
-        }
-    }
-*/
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser!=null){
-            updateUserStatus("offline");
+                updateUserStatus("offline");
         }
     }
 
-    private void VerifyUserExistance() {
-        String cirrentUserID=mAuth.getCurrentUser().getUid();
-        rootRef.child("Users").child(cirrentUserID).addValueEventListener(new ValueEventListener() {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser!=null){
+                updateUserStatus("online");
+        }
+    }
+
+    private void VerifyUserExistence() {
+        String currentUserID=mAuth.getCurrentUser().getUid();
+        rootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //if the user is not a new user and he update his profile

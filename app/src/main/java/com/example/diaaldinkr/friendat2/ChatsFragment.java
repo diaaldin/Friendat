@@ -106,7 +106,6 @@ public class ChatsFragment extends Fragment {
                                             chatIntent.putExtra("visit_user_name",profileName);
                                             chatIntent.putExtra("visit_user_image", userImage[0]);
                                             startActivity(chatIntent);
-
                                         }
                                     });
                                 }

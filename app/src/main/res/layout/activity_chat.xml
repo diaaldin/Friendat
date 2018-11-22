@@ -16,7 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/chat_toolbar"
-        android:layout_above="@+id/chat_linear_layout">
+        android:layout_above="@+id/chat_linear_layout"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:paddingBottom="5dp">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -44,11 +47,10 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/send_message_btn"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_gravity="end|bottom"
-            android:src="@android:drawable/ic_menu_send"
+            android:src="@drawable/send_black_48dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:layout_margin="7dp" />
     </LinearLayout>

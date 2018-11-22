@@ -1,15 +1,14 @@
 package com.example.diaaldinkr.friendat2;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.mbms.MbmsErrors;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -140,7 +139,7 @@ public class GroupChatActivity extends AppCompatActivity {
         Iterator iter = dataSnapshot.getChildren().iterator();
         while (iter.hasNext()){
             String chatDate = (String)((DataSnapshot)iter.next()).getValue();
-            //Here i had to dicript the message
+            //Here i had to decrypt the message
             String chatMessage = (String)((DataSnapshot)iter.next()).getValue();
             String chatName = (String)((DataSnapshot)iter.next()).getValue();
             String chatTime = (String)((DataSnapshot)iter.next()).getValue();
