@@ -84,11 +84,11 @@ public class ContactsFragment extends Fragment {
                                 if(state.equals("online")){
                                     holder.onlineIcon.setVisibility(View.VISIBLE);
                                 }else if(state.equals("offline")){
-                                    holder.onlineIcon.setVisibility(View.INVISIBLE);
+                                    holder.onlineIcon.setVisibility(View.GONE);
                                 }
 
                             }else{
-                                holder.onlineIcon.setVisibility(View.INVISIBLE);
+                                holder.onlineIcon.setVisibility(View.GONE);
                             }
 
                             if(dataSnapshot.hasChild("image")){

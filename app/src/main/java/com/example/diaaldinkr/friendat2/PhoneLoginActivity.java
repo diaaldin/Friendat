@@ -91,8 +91,8 @@ public class PhoneLoginActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                InputUserPhoneNumber.setVisibility(View.INVISIBLE);
-                SendVerificationCodeButton.setVisibility(View.INVISIBLE);
+                InputUserPhoneNumber.setVisibility(View.GONE);
+                SendVerificationCodeButton.setVisibility(View.GONE);
 
 
                 String verificationCode = InputUserVerificationCode.getText().toString();
@@ -129,10 +129,10 @@ public class PhoneLoginActivity extends AppCompatActivity
                 loadingBar.dismiss();
 
                 InputUserPhoneNumber.setVisibility(View.VISIBLE);
-                SendVerificationCodeButton.setVisibility(View.VISIBLE);
+                SendVerificationCodeButton.setVisibility(View.GONE);
 
-                InputUserVerificationCode.setVisibility(View.INVISIBLE);
-                VerifyButton.setVisibility(View.INVISIBLE);
+                InputUserVerificationCode.setVisibility(View.GONE);
+                VerifyButton.setVisibility(View.GONE);
             }
 
             public void onCodeSent(String verificationId,
@@ -146,8 +146,8 @@ public class PhoneLoginActivity extends AppCompatActivity
                 Toast.makeText(PhoneLoginActivity.this, "Code has been sent, please check and verify...", Toast.LENGTH_SHORT).show();
                 loadingBar.dismiss();
 
-                InputUserPhoneNumber.setVisibility(View.INVISIBLE);
-                SendVerificationCodeButton.setVisibility(View.INVISIBLE);
+                InputUserPhoneNumber.setVisibility(View.GONE);
+                SendVerificationCodeButton.setVisibility(View.GONE);
 
                 InputUserVerificationCode.setVisibility(View.VISIBLE);
                 VerifyButton.setVisibility(View.VISIBLE);

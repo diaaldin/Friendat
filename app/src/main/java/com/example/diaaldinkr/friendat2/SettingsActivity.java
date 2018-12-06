@@ -55,7 +55,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         InitializeFields();
 
-        userName.setVisibility(View.INVISIBLE);
         updateAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

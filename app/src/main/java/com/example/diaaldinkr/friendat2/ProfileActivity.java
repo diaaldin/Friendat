@@ -163,7 +163,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             });
         }else{
-            sendMessageRequestButton.setVisibility(View.INVISIBLE);
+            sendMessageRequestButton.setVisibility(View.GONE);
         }
     }
 
@@ -182,7 +182,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                 currentState= "new";
                                                 sendMessageRequestButton.setText("Send message");
 
-                                                declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                declineMessageRequestButton.setVisibility(View.GONE);
                                                 declineMessageRequestButton.setEnabled(false);
                                             }
                                         }
@@ -216,7 +216,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                                     currentState="friends";
                                                                     sendMessageRequestButton.setText("Remove contact");
 
-                                                                    declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                                    declineMessageRequestButton.setVisibility(View.GONE);
                                                                     declineMessageRequestButton.setEnabled(false);
                                                                 }
                                                             });
@@ -247,7 +247,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                 currentState= "new";
                                                 sendMessageRequestButton.setText("Send message");
 
-                                                declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                declineMessageRequestButton.setVisibility(View.GONE);
                                                 declineMessageRequestButton.setEnabled(false);
                                             }
                                         }

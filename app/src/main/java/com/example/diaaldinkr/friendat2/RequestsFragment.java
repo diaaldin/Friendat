@@ -195,7 +195,7 @@ public class RequestsFragment extends Fragment {
                                                 final String profileName = dataSnapshot.child("name").getValue().toString();
 
                                                 holder.userName.setText(profileName);
-                                                holder.userStatus.setText("  ");
+                                                holder.userStatus.setVisibility(View.GONE);
                                                 //here add listener to the cancel button
                                                 holder.declineButton.setOnClickListener(new View.OnClickListener() {
                                                     @Override
