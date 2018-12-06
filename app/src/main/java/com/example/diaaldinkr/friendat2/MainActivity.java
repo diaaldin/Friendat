@@ -152,8 +152,11 @@ public class MainActivity extends AppCompatActivity {
         }
         return  true;
     }
-
     private void requestNewGroup() {
+        Intent createGroupIntent = new Intent(MainActivity.this,CreateGroupActivity.class);
+        startActivity(createGroupIntent);
+    }
+    /*private void requestNewGroup() {
         //in this method I take the name of the group and store it in the database
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
         builder.setTitle("Enter group name :");
@@ -187,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
         builder.show();
 
-    }
+    }*/
 
     private void createNewGroup(final String groupName) {
         //In this method I store the group in the database

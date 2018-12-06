@@ -9,4 +9,6 @@
     <string name="decline">Decline</string>
     <string name="user_name">user name</string>
     <string name="profile_image">profile image</string>
+    <string name="group_name">Group Name</string>
+    <string name="create">Create</string>
 </resources>

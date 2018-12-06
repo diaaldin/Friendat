@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreateGroupActivity">
+
+    <include
+        layout="@layout/app_bar_layout"
+        android:id="@+id/create_group_toolbar">
+    </include>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/create_group_toolbar"
+        android:padding="16dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/set_group_image"
+            android:layout_width="61dp"
+            android:layout_height="61dp"
+            android:src="@drawable/add_photo"
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/colorPrimary"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/set_group_name"
+            android:layout_toEndOf="@+id/set_group_image"
+            android:inputType="textMultiLine"
+            android:hint="@string/group_name"
+            android:textAlignment="center"
+            android:drawableStart="@drawable/group_icon"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:background="@drawable/inputs"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:padding="6dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/create_group_button"
+            android:layout_below="@+id/set_group_name"
+            android:text="@string/create"
+            android:textAlignment="center"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold"
+            android:background="@drawable/buttons"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="10dp"
+            android:padding="6dp"
+            android:textAllCaps="false"
+            android:textSize="20sp"/>
+    </RelativeLayout>
+
+</RelativeLayout>

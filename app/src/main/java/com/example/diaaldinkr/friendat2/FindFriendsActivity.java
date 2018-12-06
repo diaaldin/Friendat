@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -79,7 +80,8 @@ public class FindFriendsActivity extends AppCompatActivity {
                         return viewHolder;
                     }
                 };
-
+        //to set divider between the items
+        findFriendsRecyclerList.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         findFriendsRecyclerList.setAdapter(adapter);
         adapter.startListening();
     }
