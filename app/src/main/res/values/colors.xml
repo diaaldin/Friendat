@@ -5,4 +5,7 @@
     <color name="colorAccent">#D4D2D4</color>
     <color name="colorSender">#2D579B</color>
     <color name="colorReceiver">#1B283F</color>
+
+    <color name="list_item_selected_state">#D4D2D4</color>
+    <color name="list_item_normal_state">#FFFFFF</color>
 </resources>

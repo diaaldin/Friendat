@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateGroupActivity">
+    tools:context=".CreateGroupActivity"
+    android:background="#fff">
 
     <include
         layout="@layout/app_bar_layout"
@@ -41,11 +42,24 @@
             android:layout_marginEnd="5dp"
             android:padding="6dp"/>
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/set_group_name">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/contacts_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                />
+        </ScrollView>
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/create_group_button"
-            android:layout_below="@+id/set_group_name"
+            android:layout_alignParentBottom="true"
             android:text="@string/create"
             android:textAlignment="center"
             android:textColor="@android:color/background_light"
@@ -57,6 +71,8 @@
             android:padding="6dp"
             android:textAllCaps="false"
             android:textSize="20sp"/>
+
+
     </RelativeLayout>
 
 </RelativeLayout>

@@ -84,7 +84,7 @@ public class GroupChatActivity extends AppCompatActivity {
             HashMap<String,Object> groupMessageKey = new HashMap<>();
             groupNameRef.updateChildren(groupMessageKey);
 
-            groupMessageKeyRef = groupNameRef.child(messageKey);
+            groupMessageKeyRef = groupNameRef.child("user_messages").child(messageKey);
 
             HashMap<String,Object> messageInfoMap = new HashMap<>();
                 messageInfoMap.put("name",currentUserName);
@@ -100,7 +100,7 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        groupNameRef.addChildEventListener(new ChildEventListener() {
+        groupNameRef.child("user_messages").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot.exists()){
