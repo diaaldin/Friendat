@@ -42,7 +42,7 @@ public class GroupChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
 
-        currentGroupName=getIntent().getExtras().get("groupName").toString();
+        currentGroupName=getIntent().getExtras().get("group_name").toString();
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID= mAuth.getCurrentUser().getUid();
@@ -50,7 +50,7 @@ public class GroupChatActivity extends AppCompatActivity {
         groupNameRef=FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
 
         InitializeFields();
-        
+
         getUserInfo();
 
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -87,11 +87,11 @@ public class GroupChatActivity extends AppCompatActivity {
             groupMessageKeyRef = groupNameRef.child("user_messages").child(messageKey);
 
             HashMap<String,Object> messageInfoMap = new HashMap<>();
-                messageInfoMap.put("name",currentUserName);
-                //here i have to encrypt the message
-                messageInfoMap.put("message",message);
-                messageInfoMap.put("date",currentDate);
-                messageInfoMap.put("time",currentTime);
+            messageInfoMap.put("name",currentUserName);
+            //here i have to encrypt the message
+            messageInfoMap.put("message",message);
+            messageInfoMap.put("date",currentDate);
+            messageInfoMap.put("time",currentTime);
             groupMessageKeyRef.updateChildren(messageInfoMap);
 
         }

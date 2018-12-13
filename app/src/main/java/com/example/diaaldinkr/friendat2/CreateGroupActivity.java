@@ -40,7 +40,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CreateGroupActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-    private DatabaseReference rootRef;
     private EditText groupNameField;
     private ProgressDialog loadingBar;
     private Button createGroup;
@@ -48,10 +47,10 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     private RecyclerView myContactList;
 
-    private DatabaseReference contactsRef, usersRef;
+    private DatabaseReference contactsRef, usersRef, rootRef, groupKeyRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
-
+    private String groupPushID;
     private ArrayList <String> groupUsersID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +86,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         mAuth= FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
-
+        groupUsersID.add(currentUserID);
         contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -100,6 +99,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setTitle("New group");
         loadingBar=new ProgressDialog(this);
+
+        groupKeyRef= rootRef.child("Group").push();
     }
 
 
@@ -109,18 +110,21 @@ public class CreateGroupActivity extends AppCompatActivity {
         //to stop the loading bar from appear if the user click on the screen
         loadingBar.setCanceledOnTouchOutside(true);
         loadingBar.show();
+        groupPushID = groupKeyRef.getKey();
         //In this method I store the group in the database
-        rootRef.child("Groups").child(groupName).setValue("")
+        rootRef.child("Groups").child(groupPushID).setValue("")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            rootRef.child("Groups").child(groupName).child("group_owner").setValue(currentUserID);
+                            rootRef.child("Groups").child(groupPushID).child("group_name").setValue(groupName);
+                            rootRef.child("Groups").child(groupPushID).child("group_owner").setValue(currentUserID);
                             HashMap<String,Object> groupMembers = new HashMap<>();
-                            for(int i=0;i<groupUsersID.size();i++){
+                            groupMembers.put("user_ID0", currentUserID);
+                            for(int i=1;i<groupUsersID.size();i++){
                                 groupMembers.put("user_ID"+i,groupUsersID.get(i));
                             }
-                            rootRef.child("Groups").child(groupName).child("group_members").updateChildren(groupMembers);
+                            rootRef.child("Groups").child(groupPushID).child("group_members").updateChildren(groupMembers);
                             //if the group add successfully
                             Toast.makeText(CreateGroupActivity.this,"The Group "+groupName+" is created successfully",Toast.LENGTH_SHORT).show();
                             loadingBar.dismiss();
@@ -178,7 +182,10 @@ public class CreateGroupActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(View v) {
                                     holder.itemView.setBackgroundColor(ContextCompat.getColor(CreateGroupActivity.this, R.color.list_item_normal_state));
-                                    groupUsersID.remove(position);
+                                    if(groupUsersID.size()>0)
+                                        groupUsersID.remove(position);
+                                    else
+                                        Toast.makeText(CreateGroupActivity.this, "Add friends first -_- ", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -217,4 +224,5 @@ public class CreateGroupActivity extends AppCompatActivity {
             onlineIcon = itemView.findViewById(R.id.user_online_status);
         }
     }
+
 }
