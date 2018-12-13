@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,12 +42,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CreateGroupActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private EditText groupNameField;
+    private CircleImageView groupImage;
+    private  static final  int galleryPick=1 ;
     private ProgressDialog loadingBar;
     private Button createGroup;
     private String groupName;
-
     private RecyclerView myContactList;
-
     private DatabaseReference contactsRef, usersRef, rootRef, groupKeyRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
@@ -58,7 +59,15 @@ public class CreateGroupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_group);
 
         InitializeFields();
-
+        groupImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent galleryIntent = new Intent();
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent,galleryPick);
+            }
+        });
         createGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,7 +92,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         groupUsersID=new ArrayList<>();
         myContactList = findViewById(R.id.contacts_list);
         myContactList.setLayoutManager(new LinearLayoutManager(this));
-
+        groupImage = findViewById(R.id.set_group_image);
         mAuth= FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         groupUsersID.add(currentUserID);
@@ -134,6 +143,11 @@ public class CreateGroupActivity extends AppCompatActivity {
         for(int i=0;i<groupUsersID.size();i++){
             Log.d(">>>", groupUsersID.get(i));
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
