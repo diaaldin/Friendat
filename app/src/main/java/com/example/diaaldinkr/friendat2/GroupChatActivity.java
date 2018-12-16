@@ -33,9 +33,9 @@ public class GroupChatActivity extends AppCompatActivity {
     private TextView displayTextMessage;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference usersRef, groupNameRef, groupMessageKeyRef;
+    private DatabaseReference usersRef, groupIdRef, groupMessageKeyRef;
 
-    private String currentGroupName, currentUserID, currentUserName , currentDate, currentTime;
+    private String currentGroupName, groupID, currentUserID, currentUserName , currentDate, currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +43,12 @@ public class GroupChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_group_chat);
 
         currentGroupName=getIntent().getExtras().get("group_name").toString();
+        groupID=getIntent().getExtras().get("group_id").toString();
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID= mAuth.getCurrentUser().getUid();
         usersRef= FirebaseDatabase.getInstance().getReference().child("Users");
-        groupNameRef=FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
+        groupIdRef=FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
 
         InitializeFields();
 
@@ -66,7 +67,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private void saveMessage() {
         //in this method i store the messages in the database
         String message =userMessageInput.getText().toString();
-        String messageKey  =groupNameRef.push().getKey();
+        String messageKey  =groupIdRef.push().getKey();
 
         if(TextUtils.isEmpty(message)){
             Toast.makeText(this,"Please write message first",Toast.LENGTH_SHORT).show();
@@ -82,9 +83,9 @@ public class GroupChatActivity extends AppCompatActivity {
             currentTime= currentTimeFormat.format(calForTime.getTime());
 
             HashMap<String,Object> groupMessageKey = new HashMap<>();
-            groupNameRef.updateChildren(groupMessageKey);
+            groupIdRef.updateChildren(groupMessageKey);
 
-            groupMessageKeyRef = groupNameRef.child("user_messages").child(messageKey);
+            groupMessageKeyRef = groupIdRef.child("user_messages").child(messageKey);
 
             HashMap<String,Object> messageInfoMap = new HashMap<>();
             messageInfoMap.put("name",currentUserName);
@@ -92,6 +93,7 @@ public class GroupChatActivity extends AppCompatActivity {
             messageInfoMap.put("message",message);
             messageInfoMap.put("date",currentDate);
             messageInfoMap.put("time",currentTime);
+            messageInfoMap.put("type","text");
             groupMessageKeyRef.updateChildren(messageInfoMap);
 
         }
@@ -100,7 +102,7 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        groupNameRef.child("user_messages").addChildEventListener(new ChildEventListener() {
+        groupIdRef.child("user_messages").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot.exists()){

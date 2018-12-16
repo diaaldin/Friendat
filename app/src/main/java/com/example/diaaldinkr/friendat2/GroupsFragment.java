@@ -92,6 +92,7 @@ public class GroupsFragment extends Fragment {
                                         @Override
                                         public void onClick(View v) {
                                             Intent groupIntent = new Intent(getContext(),GroupChatActivity.class);
+
                                             groupIntent.putExtra("group_name",groupName);
                                             startActivity(groupIntent);
                                         }

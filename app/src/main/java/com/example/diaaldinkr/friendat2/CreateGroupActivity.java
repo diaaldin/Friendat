@@ -1,8 +1,16 @@
 package com.example.diaaldinkr.friendat2;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -32,8 +40,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -45,7 +60,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private CircleImageView groupImage;
     private  static final  int galleryPick=1 ;
     private ProgressDialog loadingBar;
-    private Button createGroup;
+    private Button createGroup , addFriend;
     private String groupName;
     private RecyclerView myContactList;
     private DatabaseReference contactsRef, usersRef, rootRef, groupKeyRef;
@@ -53,6 +68,8 @@ public class CreateGroupActivity extends AppCompatActivity {
     private String currentUserID;
     private String groupPushID;
     private ArrayList <String> groupUsersID;
+    private StorageReference groupImagesRef;
+    private  Uri resultUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +79,14 @@ public class CreateGroupActivity extends AppCompatActivity {
         groupImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent,galleryPick);
+                checkAndroidVersion();
+            }
+        });
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFriend.setVisibility(View.GONE);
+                myContactList.setVisibility(View.VISIBLE);
             }
         });
         createGroup.setOnClickListener(new View.OnClickListener() {
@@ -79,9 +100,13 @@ public class CreateGroupActivity extends AppCompatActivity {
                     //store the group in the database
                     createNewGroup(groupName);
                     groupNameField.setText("");
+                    addFriend.setVisibility(View.VISIBLE);
+                    myContactList.setVisibility(View.GONE);
                     //i have to enter to the group directly from here
                     Intent groupChatIntent = new Intent(CreateGroupActivity.this,GroupChatActivity.class);
-                    groupChatIntent.putExtra("groupName",groupName);
+                    groupChatIntent.putExtra("group_name",groupName);
+                    groupChatIntent.putExtra("group_image",resultUri);
+                    groupChatIntent.putExtra("group_id",groupPushID);
                     startActivity(groupChatIntent);
                 }
             }
@@ -98,10 +123,11 @@ public class CreateGroupActivity extends AppCompatActivity {
         groupUsersID.add(currentUserID);
         contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
-
+        groupImagesRef = FirebaseStorage.getInstance().getReference().child("Group Images");
         rootRef= FirebaseDatabase.getInstance().getReference();
         groupNameField = findViewById(R.id.set_group_name);
         createGroup= findViewById(R.id.create_group_button);
+        addFriend= findViewById(R.id.add_friend_group_button);
         mToolbar = findViewById(R.id.create_group_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -134,20 +160,78 @@ public class CreateGroupActivity extends AppCompatActivity {
                                 groupMembers.put("user_ID"+i,groupUsersID.get(i));
                             }
                             rootRef.child("Groups").child(groupPushID).child("group_members").updateChildren(groupMembers);
+                            //store the image inside the firebase storage
+                            StorageReference filePath = groupImagesRef.child(groupPushID + ".jpg");
+                            filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        //get the link of the profile image from the storage and store the link in the database
+                                        final  String downloadUri = task.getResult().getDownloadUrl().toString();
+                                        rootRef.child("Groups").child(groupPushID).child("group_image").setValue(downloadUri);
+                                    }else{
+                                        String message = task.getException().toString();
+                                        Toast.makeText(CreateGroupActivity.this, "Error : "+message, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                             //if the group add successfully
                             Toast.makeText(CreateGroupActivity.this,"The Group "+groupName+" is created successfully",Toast.LENGTH_SHORT).show();
                             loadingBar.dismiss();
                         }
                     }
                 });
-        for(int i=0;i<groupUsersID.size();i++){
-            Log.d(">>>", groupUsersID.get(i));
-        }
+    }
+    public void pickImage() {
+        CropImage.startPickImageActivity(this);
+    }
+
+    //CROP REQUEST JAVA
+    private void cropRequest(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMultiTouchEnabled(true)
+                .start(this);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //RESULT FROM SELECTED IMAGE
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(this, data);
+            cropRequest(imageUri);
+        }
+
+        //RESULT FROM CROPING ACTIVITY
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                resultUri = result.getUri();
+                Picasso.get().load(resultUri).into(groupImage);
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 555 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pickImage();
+        } else {
+            checkAndroidVersion();
+        }
+    }
+
+    private void checkAndroidVersion(){
+        //REQUEST PERMISSION
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 555);
+            }catch (Exception e){
+
+            }
+        } else {
+            pickImage();
+        }
     }
 
     @Override
