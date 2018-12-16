@@ -78,22 +78,29 @@ public class GroupsFragment extends Fragment {
                 new FirebaseRecyclerAdapter<Contacts, GroupsFragment.GroupsViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final GroupsFragment.GroupsViewHolder holder, int position, @NonNull Contacts model) {
+                        final String[] groupImage = {"default_image"};
                         groupRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(dataSnapshot.exists()){
+                                    if(dataSnapshot.hasChild("group_image")){
+                                        groupImage[0] = dataSnapshot.child("group_image").getValue().toString();
+                                        Picasso.get().load(groupImage[0]).placeholder(R.drawable.profile_image).into(holder.groupImage);
+                                    }
                                     String temp= dataSnapshot.child("/").getValue().toString();
                                     int i= temp.indexOf("=");
                                     groupPushID = temp.substring(1,i);
                                     final String groupName = dataSnapshot.child(groupPushID).child("group_name").getValue().toString();
                                     Log.d(">>>", "onCreateView: "+groupName);
                                     holder.groupName.setText(groupName);
+
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             Intent groupIntent = new Intent(getContext(),GroupChatActivity.class);
-
                                             groupIntent.putExtra("group_name",groupName);
+                                            groupIntent.putExtra("group_id",groupPushID);
+                                            groupIntent.putExtra("group_image",groupImage[0]);
                                             startActivity(groupIntent);
                                         }
                                     });

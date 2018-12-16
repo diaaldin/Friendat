@@ -13,4 +13,7 @@
     <string name="create">Create</string>
     <string name="add">Add</string>
     <string name="add_friend">Add Friend</string>
+    <string name="receiver_messages">receiver messages</string>
+    <string name="time">time</string>
+    <string name="sender_messages">sender_group messages</string>
 </resources>
