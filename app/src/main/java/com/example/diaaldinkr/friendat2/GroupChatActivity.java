@@ -2,12 +2,14 @@ package com.example.diaaldinkr.friendat2;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -16,6 +18,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -42,15 +46,12 @@ public class GroupChatActivity extends AppCompatActivity {
     private RecyclerView groupMessagesList;
     private TextView groupName;
     private CircleImageView groupImage;
-
-
     private TextView displayTextMessage;
-
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef, groupIdRef, groupMessageKeyRef;
-    private final List<Messages> messagesList = new ArrayList<>();
+    private final List<groupMessages> messagesList = new ArrayList<>();
     private String currentGroupName, currentGroupImageURI, groupID, currentUserID, currentUserName , currentDate, currentTime;
-    private MessageAdapter messageAdapter;
+    private groupMessageAdapter groupMessageAdapter;
     private LinearLayoutManager linearLayoutManager;
 
     @Override
@@ -78,19 +79,18 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendMessage();
-
             }
         });
 
         groupIdRef.child("user_messages").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Messages messages = dataSnapshot.getValue(Messages.class);
-                messagesList.add(messages);
-                messageAdapter.notifyDataSetChanged();
-//                        userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
-                groupMessagesList.setAdapter(messageAdapter);
-            }
+                    groupMessages messages = dataSnapshot.getValue(groupMessages.class);
+                    messagesList.add(messages);
+                    groupMessageAdapter.notifyDataSetChanged();
+//                  userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+                    groupMessagesList.setAdapter(groupMessageAdapter);
+                }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
@@ -142,12 +142,21 @@ public class GroupChatActivity extends AppCompatActivity {
             messageInfoMap.put("sender_id",currentUserID);
             //here i have to encrypt the message
             messageInfoMap.put("message",message);
-            messageInfoMap.put("date",currentDate);
             messageInfoMap.put("time",currentTime);
             messageInfoMap.put("type","text");
-            groupMessageKeyRef.updateChildren(messageInfoMap);
-            userMessageInput.setText("");
+            groupMessageKeyRef.updateChildren(messageInfoMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    userMessageInput.setText("");
+                    if(task.isSuccessful()){
+                        Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
+
     }
 
     @Override
@@ -218,7 +227,7 @@ public class GroupChatActivity extends AppCompatActivity {
         groupMessagesList = findViewById(R.id.group_messages_list);
         groupName = findViewById(R.id.custom_group_name);
         groupImage = findViewById(R.id.custom_group_image);
-        messageAdapter = new MessageAdapter(messagesList);
+        groupMessageAdapter = new groupMessageAdapter(messagesList,groupID);
         linearLayoutManager = new LinearLayoutManager(this);
         groupMessagesList.setLayoutManager(linearLayoutManager);
 

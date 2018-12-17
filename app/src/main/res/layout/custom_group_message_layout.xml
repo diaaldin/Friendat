@@ -17,11 +17,21 @@
             android:minWidth="75dp"
             android:orientation="vertical">
             <TextView
+                android:id="@+id/sender_group_message_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sender name"
+                android:paddingTop="5dp"
+                android:paddingStart="10dp"
+                android:textSize="10sp"
+                android:textColor="@android:color/background_light"/>
+            <TextView
                 android:id="@+id/receiver_group_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/receiver_messages"
-                android:padding="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:textSize="14sp"
                 android:textColor="@android:color/background_light"/>
             <TextView
@@ -59,7 +69,6 @@
                 android:padding="10dp"
                 android:textSize="14sp"
                 android:textColor="@android:color/background_light"/>
-
             <TextView
                 android:id="@+id/sender_group_message_time"
                 android:layout_width="wrap_content"

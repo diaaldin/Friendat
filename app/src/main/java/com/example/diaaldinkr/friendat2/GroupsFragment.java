@@ -25,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -46,7 +47,7 @@ public class GroupsFragment extends Fragment {
     private DatabaseReference  usersRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
-    private DatabaseReference groupRef;
+    private DatabaseReference groupRef, groupMembersRef;
     private String groupPushID;
 
     public GroupsFragment() {
@@ -55,16 +56,16 @@ public class GroupsFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         groupsView = inflater.inflate(R.layout.fragment_groups, container, false);
         mAuth=FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
-
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         groupList = groupsView.findViewById(R.id.groups_list);
         groupList.setLayoutManager(new LinearLayoutManager(getContext()));
         groupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+        groupMembersRef = FirebaseDatabase.getInstance().getReference().child("Groups");
         return groupsView;
 
     }
@@ -77,35 +78,55 @@ public class GroupsFragment extends Fragment {
         FirebaseRecyclerAdapter<Contacts, GroupsFragment.GroupsViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, GroupsFragment.GroupsViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull final GroupsFragment.GroupsViewHolder holder, int position, @NonNull Contacts model) {
+                    protected void onBindViewHolder(@NonNull final GroupsFragment.GroupsViewHolder holder, final int position, @NonNull Contacts model) {
+                        final String groupIDs = getRef(position).getKey();
                         final String[] groupImage = {"default_image"};
-                        groupRef.addValueEventListener(new ValueEventListener() {
+                        groupRef.child(groupIDs).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists()){
-                                    if(dataSnapshot.hasChild("group_image")){
+                                if (dataSnapshot.exists()) {
+                                    if (dataSnapshot.hasChild("group_image")) {
                                         groupImage[0] = dataSnapshot.child("group_image").getValue().toString();
                                         Picasso.get().load(groupImage[0]).placeholder(R.drawable.profile_image).into(holder.groupImage);
                                     }
-                                    String temp= dataSnapshot.child("/").getValue().toString();
+                                    /*String temp= dataSnapshot.child("/").getValue().toString();
                                     int i= temp.indexOf("=");
-                                    groupPushID = temp.substring(1,i);
-                                    final String groupName = dataSnapshot.child(groupPushID).child("group_name").getValue().toString();
-                                    Log.d(">>>", "onCreateView: "+groupName);
+                                    groupPushID = temp.substring(1,i);*/
+                                    final String groupName = dataSnapshot.child("group_name").getValue().toString();
+                                    Log.d(">>>", "onCreateView: " + groupName);
                                     holder.groupName.setText(groupName);
+                                    groupMembersRef.child(groupIDs).child("group_members").child(currentUserID).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                holder.groupName.setVisibility(View.VISIBLE);
+                                                holder.groupImage.setVisibility(View.VISIBLE);
+                                                holder.itemView.setVisibility(View.VISIBLE);
+                                            }else{
+                                                holder.groupName.setVisibility(View.GONE);
+                                                holder.groupImage.setVisibility(View.GONE);
+                                                holder.itemView.setVisibility(View.GONE);
+                                            }
+                                        }
 
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            Intent groupIntent = new Intent(getContext(),GroupChatActivity.class);
-                                            groupIntent.putExtra("group_name",groupName);
-                                            groupIntent.putExtra("group_id",groupPushID);
-                                            groupIntent.putExtra("group_image",groupImage[0]);
+                                            Intent groupIntent = new Intent(getContext(), GroupChatActivity.class);
+                                            groupIntent.putExtra("group_name", groupName);
+                                            groupIntent.putExtra("group_id", groupIDs);
+                                            groupIntent.putExtra("group_image", groupImage[0]);
                                             startActivity(groupIntent);
                                         }
                                     });
                                 }
                             }
+
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
@@ -116,16 +137,15 @@ public class GroupsFragment extends Fragment {
 
                     @NonNull
                     @Override
-                    public GroupsFragment.GroupsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                    public GroupsFragment.GroupsViewHolder onCreateViewHolder(@NonNull final ViewGroup viewGroup, int i) {
+                        GroupsFragment.GroupsViewHolder viewHolder ;
                         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.group_display_layout, viewGroup, false);
-                        GroupsFragment.GroupsViewHolder viewHolder = new GroupsFragment.GroupsViewHolder(view);
+                        viewHolder = new GroupsFragment.GroupsViewHolder(view);
                         return viewHolder;
                     }
                 };
         groupList.setAdapter(adapter);
         adapter.startListening();
-
-
     }
     public static class GroupsViewHolder extends RecyclerView.ViewHolder {
         TextView groupName;
@@ -135,6 +155,9 @@ public class GroupsFragment extends Fragment {
             super(itemView);
             groupName = itemView.findViewById(R.id.group_name);
             groupImage = itemView.findViewById(R.id.group_image);
+
+            groupName.setVisibility(View.GONE);
+            groupImage.setVisibility(View.GONE);
         }
     }
 }

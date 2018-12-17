@@ -155,9 +155,9 @@ public class CreateGroupActivity extends AppCompatActivity {
                             rootRef.child("Groups").child(groupPushID).child("group_name").setValue(groupName);
                             rootRef.child("Groups").child(groupPushID).child("group_owner").setValue(currentUserID);
                             HashMap<String,Object> groupMembers = new HashMap<>();
-                            groupMembers.put("user_ID0", currentUserID);
+                            groupMembers.put(currentUserID,true);
                             for(int i=1;i<groupUsersID.size();i++){
-                                groupMembers.put("user_ID"+i,groupUsersID.get(i));
+                                groupMembers.put(groupUsersID.get(i),true);
                             }
                             rootRef.child("Groups").child(groupPushID).child("group_members").updateChildren(groupMembers);
                             //store the image inside the firebase storage

@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -77,6 +78,7 @@ public class ChatActivity extends AppCompatActivity {
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Log.d(">>>", "onChildAdded: "+ dataSnapshot.getValue());
                         Messages messages = dataSnapshot.getValue(Messages.class);
                         messagesList.add(messages);
                         messageAdapter.notifyDataSetChanged();
@@ -104,8 +106,6 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
-
-
     }
 
     private void sendMessage() {
