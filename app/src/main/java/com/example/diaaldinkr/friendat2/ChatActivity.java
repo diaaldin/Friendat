@@ -1,6 +1,8 @@
 package com.example.diaaldinkr.friendat2;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +31,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -50,7 +57,8 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
-
+    private Dialog attatchPop;
+    private ImageButton attach;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +114,13 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
+        attach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent popIntent = new Intent(ChatActivity.this, PopActivity.class);
+                startActivity(popIntent);
+            }
+        });
     }
 
     private void sendMessage() {
@@ -126,7 +141,15 @@ public class ChatActivity extends AppCompatActivity {
             SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
             saveCurrentTime = currentTime.format(calendar.getTime());
             Map messageTextBody = new HashMap();
-            messageTextBody.put("message",messageText);
+            /**************************************************************************************/
+            //Default variables for translation
+            String textToBeTranslated = messageText;
+            String TranslatedText = messageText;
+            String languagePair = "en-ar"; //English to French ("<source_language>-<target_language>")
+            //Executing the translation function
+            TranslatedText=Translate(textToBeTranslated,languagePair);
+            /**************************************************************************************/
+            messageTextBody.put("message",messageText+"=>"+TranslatedText);
             //this is the message type and the text for just text messages i had to add another types
             messageTextBody.put("type","text");
             messageTextBody.put("from",messageSenderID);
@@ -150,7 +173,31 @@ public class ChatActivity extends AppCompatActivity {
 
         }
     }
-
+    //Function for calling executing the Translator Background Task
+    private String Translate(String textToBeTranslated,String languagePair){
+        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(getApplicationContext());
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = translatorBackgroundTask.execute(textToBeTranslated,languagePair).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+                //Getting the characters between [ and ]
+                translationResult = translationResult.substring(translationResult.indexOf('[')+1);
+                translationResult = translationResult.substring(0,translationResult.indexOf("]"));
+                //Getting the characters between " and "
+                translationResult = translationResult.substring(translationResult.indexOf("\"")+1);
+                translationResult = translationResult.substring(0,translationResult.indexOf("\""));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
     private void initializeControllers() {
         //customize the toolbar
         chatToolBar = findViewById(R.id.chat_toolbar);
@@ -165,7 +212,9 @@ public class ChatActivity extends AppCompatActivity {
         userImage = findViewById(R.id.custom_profile_image);
         userName = findViewById(R.id.custom_profile_name);
         lastSeen = findViewById(R.id.custom_last_seen);
-
+        attach = findViewById(R.id.attach_button);
+        attatchPop=new Dialog(this);
+        attatchPop.setContentView(R.layout.attach_pop_up);
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
 
@@ -211,4 +260,5 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
 }

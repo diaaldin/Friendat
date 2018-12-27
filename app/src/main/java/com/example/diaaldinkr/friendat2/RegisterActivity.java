@@ -81,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 String currentUserID = mAuth.getCurrentUser().getUid();
                                 rootRef.child("Users").child(currentUserID).setValue("");
 
-                                rootRef.child("users").child(currentUserID).child("device_tokens").setValue(deviceToken)
+                                rootRef.child("Users").child(currentUserID).child("device_tokens").setValue(deviceToken)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
