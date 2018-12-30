@@ -10,8 +10,11 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,7 +31,11 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -43,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
     private  static final  int galleryPick=1 ;
     private StorageReference userProfileImagesRef;
     private ProgressDialog loadingBar;
+    private Spinner spinner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +81,34 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivityForResult(galleryIntent,galleryPick);
             }
         });
+        spinner.setPrompt("Select Language");
+        // Spinner Drop down elements
+        List<String> languages = new ArrayList<>(
+                Arrays.asList("Azerbaijani", "Albanian", "English", "Arabic" , "Armenian" ,
+                        "Bashkir","Belarusian","Bulgarian", "Hungarian" , "Greek",  "Georgian", "Danish", "Hebrew",
+                        "Spanish","Italian","Kazakh","Catalan", "Latvian",  "Lithuanian",   "Macedonian",  "German", "Dutch",
+                        "Norwegian", "Persian", "Polish", "Portuguese",   "Romanian",  "Russian", "Serbian",  "Slovak", "Slovenian",
+                        "Tatar","Turkish", "Ukrainian", "Finnish","French", "Croatian",  "Czech", "Swedish", "Estonian"));
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, languages);
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // On selecting a spinner item
+                String item = parent.getItemAtPosition(position).toString();
+                // Showing selected spinner item
+                Toast.makeText(parent.getContext(), "Selected: " + item +"Number"+position, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
     }
 
@@ -82,7 +118,7 @@ public class SettingsActivity extends AppCompatActivity {
         userStatus = findViewById(R.id.set_profile_status);
         userProfileImage = findViewById(R.id.set_profile_image);
         loadingBar =new ProgressDialog(this);
-
+        spinner = findViewById(R.id.spinner);
         mToolbar = findViewById(R.id.settings_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -96,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         if(requestCode==galleryPick && resultCode==RESULT_OK && data!=null){
             Uri ImageUri = data.getData();
-           //to open the crop activity
+            //to open the crop activity
             CropImage.activity()
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(1,1)
@@ -162,10 +198,10 @@ public class SettingsActivity extends AppCompatActivity {
         else{
             //saving the data in the database
             HashMap<String,Object> profileMap = new HashMap<>();
-                profileMap.put("uid",currentUserID);
-                profileMap.put("name",setUserName);
-                profileMap.put("status",setStatus);
-                //save the data in the user child
+            profileMap.put("uid",currentUserID);
+            profileMap.put("name",setUserName);
+            profileMap.put("status",setStatus);
+            //save the data in the user child
             rootRef.child("Users").child(currentUserID).updateChildren(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
