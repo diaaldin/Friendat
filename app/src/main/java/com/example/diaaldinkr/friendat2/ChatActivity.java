@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,10 +29,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
@@ -57,7 +53,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
-    private Dialog attatchPop;
+    private Dialog attachPop;
     private ImageButton attach;
 
     @Override
@@ -144,12 +140,13 @@ public class ChatActivity extends AppCompatActivity {
             /**************************************************************************************/
             //Default variables for translation
             String textToBeTranslated = messageText;
-            String TranslatedText = messageText;
+            String TranslatedText;
             String languagePair = "en-ar"; //English to French ("<source_language>-<target_language>")
             //Executing the translation function
             TranslatedText=Translate(textToBeTranslated,languagePair);
             /**************************************************************************************/
-            messageTextBody.put("message",messageText+"=>"+TranslatedText);
+            messageTextBody.put("message",messageText);
+            messageTextBody.put("TranslatedMessage",TranslatedText);
             //this is the message type and the text for just text messages i had to add another types
             messageTextBody.put("type","text");
             messageTextBody.put("from",messageSenderID);
@@ -213,8 +210,8 @@ public class ChatActivity extends AppCompatActivity {
         userName = findViewById(R.id.custom_profile_name);
         lastSeen = findViewById(R.id.custom_last_seen);
         attach = findViewById(R.id.attach_button);
-        attatchPop=new Dialog(this);
-        attatchPop.setContentView(R.layout.attach_pop_up);
+        attachPop=new Dialog(this);
+        attachPop.setContentView(R.layout.attach_pop_up);
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
 

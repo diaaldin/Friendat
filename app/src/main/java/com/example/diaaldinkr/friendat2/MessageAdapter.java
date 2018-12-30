@@ -68,26 +68,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             if(fromUserID.equals(messageSenderID)){
                 messageViewHolder.receiverMessageText.setVisibility(View.GONE);
+                messageViewHolder.receiverTranslatedMessageText.setVisibility(View.GONE);
                 messageViewHolder.receiverMessageTime.setVisibility(View.GONE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
 
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
+                messageViewHolder.senderTranslatedMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
 
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
+                messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
                 messageViewHolder.senderMessageText.setText(messages.getMessage());
+                messageViewHolder.senderTranslatedMessageText.setText(messages.getTranslatedMessage());
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
             }
             else{
                 messageViewHolder.senderMessageText.setVisibility(View.GONE);
+                messageViewHolder.senderTranslatedMessageText.setVisibility(View.GONE);
                 messageViewHolder.senderMessageTime.setVisibility(View.GONE);
 
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverTranslatedMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
 
                 messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                messageViewHolder.receiverMessageText.setText(messages.getMessage());
+                messageViewHolder.receiverTranslatedMessageText.setBackgroundResource(R.drawable.receiver_translated_message_layout);
+                messageViewHolder.receiverMessageText.setText(messages.getTranslatedMessage());
+                messageViewHolder.receiverTranslatedMessageText.setText(messages.getMessage());
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
             }
         }
@@ -100,22 +108,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     public class  MessageViewHolder extends RecyclerView.ViewHolder{
-        public TextView senderMessageText, receiverMessageText ,receiverMessageTime,senderMessageTime;
+        public TextView senderMessageText, receiverMessageText ,receiverMessageTime, senderMessageTime ,senderTranslatedMessageText, receiverTranslatedMessageText;
         public CircleImageView receiverProfileImage;
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
 
             senderMessageText = itemView.findViewById(R.id.sender_message_text);
+            senderTranslatedMessageText = itemView.findViewById(R.id.sender_translated_message_text);
             senderMessageTime = itemView.findViewById(R.id.sender_message_time);
 
 
             receiverMessageText = itemView.findViewById(R.id.receiver_message_text);
+            receiverTranslatedMessageText = itemView.findViewById(R.id.receiver_translated_message_text);
             receiverMessageTime = itemView.findViewById(R.id.receiver_message_time);
             receiverProfileImage = itemView.findViewById(R.id.message_profile_image);
 
             senderMessageText.setVisibility(View.GONE);
             receiverMessageText.setVisibility(View.GONE);
             receiverProfileImage.setVisibility(View.GONE);
+            senderTranslatedMessageText.setVisibility(View.GONE);
+            receiverTranslatedMessageText.setVisibility(View.GONE);
         }
     }
 }
