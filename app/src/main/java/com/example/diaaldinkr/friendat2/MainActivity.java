@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -67,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser==null){
+            Log.d(">>>>", "onStart: null");
             sendUserToLoginActivity();
         }
         else{
+            Log.d(">>>>", "onStart: not null");
             updateUserStatus("online");
             VerifyUserExistence();
         }

@@ -12,31 +12,25 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by DoguD on 01/07/2017.
- */
-
-public class TranslatorBackgroundTask extends AsyncTask<String, Void, String> {
+public class DetectorBackgroundTask extends AsyncTask<String, Void, String>{
     //Declare Context
     Context ctx;
     //Set Context
-    TranslatorBackgroundTask(Context ctx){
+    DetectorBackgroundTask(Context ctx){
         this.ctx = ctx;
     }
-
     @Override
-    protected String doInBackground(String... params) {
+    protected String doInBackground(String ... text) {
         //String variables
-        String textToBeTranslated = params[0];
-        String languagePair = params[1];
+        String textToBeDetected = text[0];
 
         String jsonString;
 
         try {
             //Set up the translation call URL
             String yandexKey = "trnsl.1.1.20181227T152408Z.645f1cba0f83e6d3.3e1e439a3a8f1b83134cd7bd3116f9e127e6cccc";
-            String yandexUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + yandexKey
-                    + "&text=" + textToBeTranslated + "&lang=" + languagePair;
+            String yandexUrl = "https://translate.yandex.net/api/v1.5/tr.json/detect?key=" + yandexKey
+                    + "&text=" + textToBeDetected ;
             URL yandexTranslateURL = new URL(yandexUrl);
 
             //Set Http Conncection, Input Stream, and Buffered Reader
@@ -57,14 +51,16 @@ public class TranslatorBackgroundTask extends AsyncTask<String, Void, String> {
 
             //Making result human readable
             String resultString = jsonStringBuilder.toString().trim();
-            //Getting the characters between [ and ]
-            resultString = resultString.substring(resultString.indexOf('[')+1);
-            resultString = resultString.substring(0,resultString.indexOf("]"));
+            //Getting the characters between , and }
+            resultString = resultString.substring(resultString.indexOf(',')+1);
+            resultString = resultString.substring(0,resultString.indexOf("}"));
+            //Getting the characters after :
+            resultString = resultString.substring(resultString.indexOf(':')+1);
             //Getting the characters between " and "
             resultString = resultString.substring(resultString.indexOf("\"")+1);
             resultString = resultString.substring(0,resultString.indexOf("\""));
 
-            Log.d("Translation Result:", resultString);
+            Log.d("Detection Result:", resultString);
             return resultString;
 
         } catch (MalformedURLException e) {
@@ -74,19 +70,4 @@ public class TranslatorBackgroundTask extends AsyncTask<String, Void, String> {
         }
         return null;
     }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
-    }
 }
-

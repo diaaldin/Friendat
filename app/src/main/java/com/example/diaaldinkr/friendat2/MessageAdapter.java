@@ -1,11 +1,14 @@
 package com.example.diaaldinkr.friendat2;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -15,7 +18,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -23,9 +30,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private List<Messages> userMessagesList;
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
-
-    public MessageAdapter(List<Messages> userMessagesList ){
+    private Context context;
+    public MessageAdapter(List<Messages> userMessagesList ,Context context){
         this.userMessagesList = userMessagesList;
+        this.context=context;
     }
 
     @NonNull
@@ -47,8 +55,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         String fromMessageType = messages.getType();
         String messageTime = messages.getTime();
 
-        userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(fromUserID);
-        userRef.addValueEventListener(new ValueEventListener() {
+        userRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        userRef.child(fromUserID).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild("image")){
@@ -62,9 +70,32 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     }
                 });
         if(fromMessageType.equals("text")){
-            /*messageViewHolder.receiverMessageText.setVisibility(View.GONE);
-            messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
-            messageViewHolder.senderMessageText.setVisibility(View.GONE);*/
+            //Default variables for translation
+            String textToBeTranslated = messages.getMessage();
+            String TranslatedText;
+            String source_language;
+            final String[] target_language = new String[1];
+            /*
+            * fe moshkelet null
+            * https://stackoverflow.com/questions/47847694/how-to-return-datasnapshot-value-as-a-result-of-a-method
+            * */
+            userRef.child(messages.getTo()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    target_language[0] =dataSnapshot.child("lang_code").getValue().toString();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            Log.d(">>>", "code: "+  target_language[0]);
+            source_language=Detect(textToBeTranslated);
+            String languagePair = source_language+"-"+ "ar"; // ("<source_language>-<target_language>")
+            //Executing the translation function
+            Log.d(">>>", "onBindViewHolder: "+ languagePair);
+            TranslatedText=Translate(textToBeTranslated,languagePair);
 
             if(fromUserID.equals(messageSenderID)){
                 messageViewHolder.receiverMessageText.setVisibility(View.GONE);
@@ -79,7 +110,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
                 messageViewHolder.senderMessageText.setText(messages.getMessage());
-                messageViewHolder.senderTranslatedMessageText.setText(messages.getTranslatedMessage());
+                messageViewHolder.senderTranslatedMessageText.setText(TranslatedText);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
             }
             else{
@@ -94,14 +125,52 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 messageViewHolder.receiverTranslatedMessageText.setBackgroundResource(R.drawable.receiver_translated_message_layout);
-                messageViewHolder.receiverMessageText.setText(messages.getTranslatedMessage());
+
+                messageViewHolder.receiverMessageText.setText(TranslatedText);
                 messageViewHolder.receiverTranslatedMessageText.setText(messages.getMessage());
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
             }
         }
 
     }
-
+    //Function for calling executing the Detector Background Task
+    private String Detect(String textToBeDetected){
+        DetectorBackgroundTask detectorBackgroundTask= new DetectorBackgroundTask(context);
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = detectorBackgroundTask.execute(textToBeDetected).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
+    //Function for calling executing the Translator Background Task
+    private String Translate(String textToBeTranslated,String languagePair){
+        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(context);
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = translatorBackgroundTask.execute(textToBeTranslated,languagePair).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
     @Override
     public int getItemCount() {
         return userMessagesList.size();

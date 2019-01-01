@@ -1,25 +1,26 @@
 package com.example.diaaldinkr.friendat2;
 
 public class Messages {
-    private String from, message, type, time ,TranslatedMessage;
+    private String from, to, message, type, time ;
 
     public Messages() { }
 
-    public Messages(String from, String message, String type, String time, String TranslatedMessage) {
+    public Messages(String from, String to ,String message, String type, String time) {
         this.from = from;
+        this.to = to;
         this.message = message;
         this.type = type;
         this.time=time;
-        this.TranslatedMessage=TranslatedMessage;
 
     }
     public String getFrom() {
         return from;
     }
 
-    public String getTranslatedMessage() {
-        return TranslatedMessage;
+    public String getTo() {
+        return to;
     }
+
 
     public String getMessage() {
         return message;

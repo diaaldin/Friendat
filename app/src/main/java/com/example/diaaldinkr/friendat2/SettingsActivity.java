@@ -9,12 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -81,35 +83,18 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivityForResult(galleryIntent,galleryPick);
             }
         });
-        spinner.setPrompt("Select Language");
+
+        spinner.setPrompt("Languages:");
         // Spinner Drop down elements
         List<String> languages = new ArrayList<>(
-                Arrays.asList("Azerbaijani", "Albanian", "English", "Arabic" , "Armenian" ,
-                        "Bashkir","Belarusian","Bulgarian", "Hungarian" , "Greek",  "Georgian", "Danish", "Hebrew",
-                        "Spanish","Italian","Kazakh","Catalan", "Latvian",  "Lithuanian",   "Macedonian",  "German", "Dutch",
-                        "Norwegian", "Persian", "Polish", "Portuguese",   "Romanian",  "Russian", "Serbian",  "Slovak", "Slovenian",
-                        "Tatar","Turkish", "Ukrainian", "Finnish","French", "Croatian",  "Czech", "Swedish", "Estonian"));
+                Arrays.asList("Languages:","Chinese","Spanish","English","Hindi","Arabic","Portuguese","Bengali","Russian",
+                        "Japanese","Punjabi","German","Javanese","Hebrew"));
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, languages);
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // On selecting a spinner item
-                String item = parent.getItemAtPosition(position).toString();
-                // Showing selected spinner item
-                Toast.makeText(parent.getContext(), "Selected: " + item +"Number"+position, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
     }
 
     private void InitializeFields() {
@@ -188,6 +173,21 @@ public class SettingsActivity extends AppCompatActivity {
 
         String setUserName = userName.getText().toString();
         String setStatus = userStatus.getText().toString();
+        final List<String> languagesCode = new ArrayList<>(
+                Arrays.asList(" ","zh","es","en","hi","ar","pt","bn","ru","ja","pa","de","jv","he"));
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        String code = languagesCode.get(spinner.getSelectedItemPosition());
 
         if(TextUtils.isEmpty(setStatus)){
             Toast.makeText(this, "Please write your username ", Toast.LENGTH_SHORT).show();
@@ -195,12 +195,17 @@ public class SettingsActivity extends AppCompatActivity {
         if(TextUtils.isEmpty(setUserName)){
             Toast.makeText(this, "Please write your status ", Toast.LENGTH_SHORT).show();
         }
+        if(TextUtils.equals(code," ")){
+            Toast.makeText(this, "Please choose your spoken language ", Toast.LENGTH_SHORT).show();
+        }
         else{
             //saving the data in the database
             HashMap<String,Object> profileMap = new HashMap<>();
+            Log.d(">>>>", "upDateSettings: "+currentUserID+" "+setUserName+" "+setStatus+" "+code);
             profileMap.put("uid",currentUserID);
             profileMap.put("name",setUserName);
             profileMap.put("status",setStatus);
+            profileMap.put("lang_code",code);
             //save the data in the user child
             rootRef.child("Users").child(currentUserID).updateChildren(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -238,11 +243,11 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                         //if the user exist and he update the name and the status
                         else if(dataSnapshot.exists() && dataSnapshot.hasChild("name")){
-                            String retriveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retriveStatus = dataSnapshot.child("status").getValue().toString();
+                            String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                            String retrieveStatus = dataSnapshot.child("status").getValue().toString();
 
-                            userName.setText(retriveUserName);
-                            userStatus.setText(retriveStatus);
+                            userName.setText(retrieveUserName);
+                            userStatus.setText(retrieveStatus);
 
                         }
                         //if the user is new or not update his information

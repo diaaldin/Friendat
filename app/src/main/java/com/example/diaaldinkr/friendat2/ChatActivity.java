@@ -138,18 +138,12 @@ public class ChatActivity extends AppCompatActivity {
             saveCurrentTime = currentTime.format(calendar.getTime());
             Map messageTextBody = new HashMap();
             /**************************************************************************************/
-            //Default variables for translation
-            String textToBeTranslated = messageText;
-            String TranslatedText;
-            String languagePair = "en-ar"; //English to French ("<source_language>-<target_language>")
-            //Executing the translation function
-            TranslatedText=Translate(textToBeTranslated,languagePair);
             /**************************************************************************************/
             messageTextBody.put("message",messageText);
-            messageTextBody.put("TranslatedMessage",TranslatedText);
             //this is the message type and the text for just text messages i had to add another types
             messageTextBody.put("type","text");
             messageTextBody.put("from",messageSenderID);
+            messageTextBody.put("to",messageReceiverID);
             messageTextBody.put("time",saveCurrentTime);
 
             Map messageBodyDetails= new HashMap();
@@ -169,31 +163,6 @@ public class ChatActivity extends AppCompatActivity {
             });
 
         }
-    }
-    //Function for calling executing the Translator Background Task
-    private String Translate(String textToBeTranslated,String languagePair){
-        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(getApplicationContext());
-        String translationResult = null; // Returns the translated text as a String
-        try {
-            translationResult = translatorBackgroundTask.execute(textToBeTranslated,languagePair).get();
-            try {
-                final JSONObject translationResultObj = new JSONObject(translationResult);
-                translationResult=translationResultObj.get("text").toString();
-                //Getting the characters between [ and ]
-                translationResult = translationResult.substring(translationResult.indexOf('[')+1);
-                translationResult = translationResult.substring(0,translationResult.indexOf("]"));
-                //Getting the characters between " and "
-                translationResult = translationResult.substring(translationResult.indexOf("\"")+1);
-                translationResult = translationResult.substring(0,translationResult.indexOf("\""));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return translationResult;
     }
     private void initializeControllers() {
         //customize the toolbar
@@ -216,7 +185,7 @@ public class ChatActivity extends AppCompatActivity {
         sendMessageButton = findViewById(R.id.send_message_btn);
 
         userMessagesList = findViewById(R.id.private_messages_list);
-        messageAdapter = new MessageAdapter(messagesList);
+        messageAdapter = new MessageAdapter(messagesList, getApplicationContext());
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
     }
