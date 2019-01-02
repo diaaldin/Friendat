@@ -69,32 +69,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                     }
                 });
+
         if(fromMessageType.equals("text")){
+
+            String target_language=messages.getTo();
+            Log.d(">>>", "onBindViewHolder: "+target_language);
             //Default variables for translation
             String textToBeTranslated = messages.getMessage();
             String TranslatedText;
             String source_language;
-            final String[] target_language = new String[1];
-            /*
-            * fe moshkelet null
-            * https://stackoverflow.com/questions/47847694/how-to-return-datasnapshot-value-as-a-result-of-a-method
-            * */
-            userRef.child(messages.getTo()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    target_language[0] =dataSnapshot.child("lang_code").getValue().toString();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-            Log.d(">>>", "code: "+  target_language[0]);
             source_language=Detect(textToBeTranslated);
-            String languagePair = source_language+"-"+ "ar"; // ("<source_language>-<target_language>")
+            String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
             //Executing the translation function
-            Log.d(">>>", "onBindViewHolder: "+ languagePair);
             TranslatedText=Translate(textToBeTranslated,languagePair);
 
             if(fromUserID.equals(messageSenderID)){

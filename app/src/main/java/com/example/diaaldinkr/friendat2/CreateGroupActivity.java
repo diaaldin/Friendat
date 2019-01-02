@@ -69,7 +69,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private String groupPushID;
     private ArrayList <String> groupUsersID;
     private StorageReference groupImagesRef;
-    private  Uri resultUri;
+    private  Uri resultUri = Uri.parse("android.resource://com.example.diaaldinkr.friendat2/drawable/group_image");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,8 +105,9 @@ public class CreateGroupActivity extends AppCompatActivity {
                     //i have to enter to the group directly from here
                     Intent groupChatIntent = new Intent(CreateGroupActivity.this,GroupChatActivity.class);
                     groupChatIntent.putExtra("group_name",groupName);
-                    groupChatIntent.putExtra("group_image",resultUri);
                     groupChatIntent.putExtra("group_id",groupPushID);
+                    groupChatIntent.putExtra("group_image", resultUri);
+                    Log.d(">>>", "onClick: 11"+resultUri);
                     startActivity(groupChatIntent);
                 }
             }
@@ -160,21 +161,22 @@ public class CreateGroupActivity extends AppCompatActivity {
                                 groupMembers.put(groupUsersID.get(i),true);
                             }
                             rootRef.child("Groups").child(groupPushID).child("group_members").updateChildren(groupMembers);
-                            //store the image inside the firebase storage
                             StorageReference filePath = groupImagesRef.child(groupPushID + ".jpg");
-                            filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                    if(task.isSuccessful()){
-                                        //get the link of the profile image from the storage and store the link in the database
-                                        final  String downloadUri = task.getResult().getDownloadUrl().toString();
-                                        rootRef.child("Groups").child(groupPushID).child("group_image").setValue(downloadUri);
-                                    }else{
-                                        String message = task.getException().toString();
-                                        Toast.makeText(CreateGroupActivity.this, "Error : "+message, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+                            //store the image inside the firebase storage
+                               filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                   @Override
+                                   public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                       if (task.isSuccessful()) {
+                                           //get the link of the profile image from the storage and store the link in the database
+                                           final String downloadUri = task.getResult().getDownloadUrl().toString();
+                                           rootRef.child("Groups").child(groupPushID).child("group_image").setValue(downloadUri);
+                                       } else {
+                                           String message = task.getException().toString();
+                                           Toast.makeText(CreateGroupActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
+                                       }
+                                   }
+                               });
+
                             //if the group add successfully
                             Toast.makeText(CreateGroupActivity.this,"The Group "+groupName+" is created successfully",Toast.LENGTH_SHORT).show();
                             loadingBar.dismiss();
@@ -262,10 +264,9 @@ public class CreateGroupActivity extends AppCompatActivity {
                             }else {
                                 String profileName = dataSnapshot.child("name").getValue().toString();
                                 String profileStatus = dataSnapshot.child("status").getValue().toString();
-
+                                //String userImage = dataSnapshot.child("image").getValue().toString();
                                 holder.userName.setText(profileName);
                                 holder.userStatus.setText(profileStatus);
-
                             }
 
                             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {

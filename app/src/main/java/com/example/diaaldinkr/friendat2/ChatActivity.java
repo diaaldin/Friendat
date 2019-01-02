@@ -41,7 +41,7 @@ import java.util.concurrent.ExecutionException;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
-    private  String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID;
+    private  String messageReceiverID, messageReceiverName, messageReceiverLangCode, messageReceiverImage, messageSenderID;
     private TextView userName, lastSeen;
     private CircleImageView userImage;
     private Toolbar chatToolBar;
@@ -67,6 +67,7 @@ public class ChatActivity extends AppCompatActivity {
         messageReceiverID = getIntent().getExtras().get("visit_user_id").toString();
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = getIntent().getExtras().get("visit_user_image").toString();
+        messageReceiverLangCode = getIntent().getExtras().get("visit_user_lang_code").toString();
 
         initializeControllers();
         userName.setText(messageReceiverName);
@@ -124,6 +125,7 @@ public class ChatActivity extends AppCompatActivity {
         if(TextUtils.isEmpty(messageText)){
             Toast.makeText(this, "write a message first", Toast.LENGTH_SHORT).show();
         }else{
+            messageInput.setText("");
             String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
             String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
 
@@ -143,7 +145,7 @@ public class ChatActivity extends AppCompatActivity {
             //this is the message type and the text for just text messages i had to add another types
             messageTextBody.put("type","text");
             messageTextBody.put("from",messageSenderID);
-            messageTextBody.put("to",messageReceiverID);
+            messageTextBody.put("to",messageReceiverLangCode);
             messageTextBody.put("time",saveCurrentTime);
 
             Map messageBodyDetails= new HashMap();
@@ -153,7 +155,6 @@ public class ChatActivity extends AppCompatActivity {
             rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
-                    messageInput.setText("");
                     if(task.isSuccessful()){
                         Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
                     }else{

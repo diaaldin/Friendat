@@ -69,6 +69,8 @@ public class ChatsFragment extends Fragment {
                     protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model) {
                         final String userIDs = getRef(position).getKey();
                         final String[] userImage = {"default_image"};
+                        final String userLangCode ;
+
                         usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -78,6 +80,7 @@ public class ChatsFragment extends Fragment {
                                         Picasso.get().load(userImage[0]).placeholder(R.drawable.profile_image).into(holder.profileImage);
                                     }
                                     final String profileName = dataSnapshot.child("name").getValue().toString();
+                                    final String userLangCode = dataSnapshot.child("lang_code").getValue().toString();
                                     holder.userName.setText(profileName);
                                     holder.userStatus.setText("Last Seen: "+"\n"+"Date "+" Time");
 
@@ -105,6 +108,7 @@ public class ChatsFragment extends Fragment {
                                             chatIntent.putExtra("visit_user_id",userIDs);
                                             chatIntent.putExtra("visit_user_name",profileName);
                                             chatIntent.putExtra("visit_user_image", userImage[0]);
+                                            chatIntent.putExtra("visit_user_lang_code",userLangCode);
                                             startActivity(chatIntent);
                                         }
                                     });

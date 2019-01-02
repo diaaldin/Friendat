@@ -1,8 +1,12 @@
 package com.example.diaaldinkr.friendat2;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -53,6 +57,9 @@ public class SettingsActivity extends AppCompatActivity {
     private StorageReference userProfileImagesRef;
     private ProgressDialog loadingBar;
     private Spinner spinner;
+    private  Uri resultUri = Uri.parse("android.resource://com.example.diaaldinkr.friendat2/drawable/profile_image");
+    private boolean pick = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
         updateAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                upDateSettings();
+                updateSettings();
             }
         });
 
@@ -77,10 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent,galleryPick);
+                checkAndroidVersion();
             }
         });
 
@@ -96,7 +100,55 @@ public class SettingsActivity extends AppCompatActivity {
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
     }
+    private void checkAndroidVersion(){
+        //REQUEST PERMISSION
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 555);
+            }catch (Exception e){
 
+            }
+        } else {
+            pickImage();
+        }
+    }
+    public void pickImage() {
+        CropImage.startPickImageActivity(this);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //RESULT FROM SELECTED IMAGE
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(this, data);
+            cropRequest(imageUri);
+        }
+
+        //RESULT FROM CROPING ACTIVITY
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                resultUri = result.getUri();
+                Picasso.get().load(resultUri).into(userProfileImage);
+                pick=true;
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 555 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pickImage();
+        } else {
+            checkAndroidVersion();
+        }
+    }
+    //CROP REQUEST JAVA
+    private void cropRequest(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMultiTouchEnabled(true)
+                .start(this);
+    }
     private void InitializeFields() {
         updateAccountSettings = findViewById(R.id.update_settings_button);
         userName = findViewById(R.id.set_user_name);
@@ -111,65 +163,7 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Settings");
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode==galleryPick && resultCode==RESULT_OK && data!=null){
-            Uri ImageUri = data.getData();
-            //to open the crop activity
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1,1)
-                    .start(this);
-        }
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-
-            if(resultCode==RESULT_OK){
-                loadingBar.setTitle("Set Profile Image");
-                loadingBar.setMessage("please wait till finish to upload the image");
-                loadingBar.setCanceledOnTouchOutside(false);
-                loadingBar.show();
-                //resultUri is contain the cropped image
-                Uri resultUri = result.getUri();
-                //store the image inside the firebase storage
-                StorageReference filePath = userProfileImagesRef.child(currentUserID + ".jpg");
-                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(SettingsActivity.this, "Profile image uploaded successfully", Toast.LENGTH_SHORT).show();
-                            //get the link of the profile image from the storage and store the link in the database
-                            final  String downloadUri = task.getResult().getDownloadUrl().toString();
-                            rootRef.child("Users").child(currentUserID).child("image").setValue(downloadUri)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
-                                                Toast.makeText(SettingsActivity.this, "Image saved in the database", Toast.LENGTH_SHORT).show();
-                                                loadingBar.dismiss();
-                                            }else{
-                                                userName.setVisibility(View.VISIBLE);
-                                                Toast.makeText(SettingsActivity.this,"Please update your profile ", Toast.LENGTH_SHORT).show();
-                                                loadingBar.dismiss();
-                                            }
-                                        }
-                                    });
-                        }else{
-                            String message = task.getException().toString();
-                            Toast.makeText(SettingsActivity.this, "Error : "+message, Toast.LENGTH_SHORT).show();
-                            loadingBar.dismiss();
-                        }
-                    }
-                });
-            }
-
-        }
-
-    }
-
-    private void upDateSettings() {
+    private void updateSettings() {
 
         String setUserName = userName.getText().toString();
         String setStatus = userStatus.getText().toString();
@@ -221,6 +215,36 @@ public class SettingsActivity extends AppCompatActivity {
                             }
                         }
                     });
+            if(pick) {
+                //store the image inside the firebase storage
+                StorageReference filePath = userProfileImagesRef.child(currentUserID + ".jpg");
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(SettingsActivity.this, "Profile image uploaded successfully", Toast.LENGTH_SHORT).show();
+                            //get the link of the profile image from the storage and store the link in the database
+                            final String downloadUri = task.getResult().getDownloadUrl().toString();
+                            rootRef.child("Users").child(currentUserID).child("image").setValue(downloadUri)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(SettingsActivity.this, "Image saved in the database", Toast.LENGTH_SHORT).show();
+                                                pick=false;
+                                            } else {
+                                                userName.setVisibility(View.VISIBLE);
+                                                Toast.makeText(SettingsActivity.this, "Please update your profile ", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        } else {
+                            String message = task.getException().toString();
+                            Toast.makeText(SettingsActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -235,9 +259,14 @@ public class SettingsActivity extends AppCompatActivity {
                             String retrieveUserName = dataSnapshot.child("name").getValue().toString();
                             String retrieveStatus = dataSnapshot.child("status").getValue().toString();
                             String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
+                            String retrieveLanguagesCode = dataSnapshot.child("lang_code").getValue().toString();
 
                             userName.setText(retrieveUserName);
                             userStatus.setText(retrieveStatus);
+                            final List<String> languagesCode = new ArrayList<>(
+                                    Arrays.asList(" ","zh","es","en","hi","ar","pt","bn","ru","ja","pa","de","jv","he"));
+
+                            spinner.setSelection(languagesCode.indexOf(retrieveLanguagesCode));
                             Picasso.get().load(retrieveProfileImage).into(userProfileImage);
 
                         }
