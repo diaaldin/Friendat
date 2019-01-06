@@ -44,10 +44,7 @@
         <activity
             android:name=".CreateGroupActivity"
             android:parentActivityName=".MainActivity">
-            >
         </activity>
-        <activity android:name=".PopActivity"
-            android:theme="@style/AppTheme.PopMe"></activity>
     </application>
 
 </manifest>

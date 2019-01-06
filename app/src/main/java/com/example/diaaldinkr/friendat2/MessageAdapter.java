@@ -71,7 +71,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 });
 
         if(fromMessageType.equals("text")){
-
             String target_language=messages.getTo();
             Log.d(">>>", "onBindViewHolder: "+target_language);
             //Default variables for translation
@@ -116,6 +115,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverTranslatedMessageText.setText(messages.getMessage());
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
             }
+        }else if(fromMessageType.equals("image")){
+
         }
 
     }

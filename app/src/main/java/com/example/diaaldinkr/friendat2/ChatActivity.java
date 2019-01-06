@@ -1,8 +1,13 @@
 package com.example.diaaldinkr.friendat2;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -28,7 +33,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
@@ -49,12 +60,14 @@ public class ChatActivity extends AppCompatActivity {
     private EditText messageInput;
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
+    private StorageReference usersImagesMessagesRef;
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
-    private Dialog attachPop;
     private ImageButton attach;
+    private  Uri resultUri;
+    private boolean pick = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +85,7 @@ public class ChatActivity extends AppCompatActivity {
         initializeControllers();
         userName.setText(messageReceiverName);
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
-
+        usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,12 +127,105 @@ public class ChatActivity extends AppCompatActivity {
         attach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent popIntent = new Intent(ChatActivity.this, PopActivity.class);
-                startActivity(popIntent);
+                checkAndroidVersion();
             }
         });
     }
+    private void checkAndroidVersion(){
+        //REQUEST PERMISSION
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 555);
+            }catch (Exception e){
 
+            }
+        } else {
+            pickImage();
+        }
+    }
+    public void pickImage() {
+        CropImage.startPickImageActivity(this);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //RESULT FROM SELECTED IMAGE
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(this, data);
+            cropRequest(imageUri);
+        }
+
+        //RESULT FROM CROPING ACTIVITY
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                resultUri = result.getUri();
+                //store the image inside the firebase storage
+                final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
+                final String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
+
+                DatabaseReference userMessageKeyRef = rootRef.child("Messages").child(messageSenderID)
+                        .child(messageReceiverID).push();
+                //this key used to store the messages
+                final String messagePushID = userMessageKeyRef.getKey();
+                StorageReference filePath = usersImagesMessagesRef.child(messagePushID + ".jpg");
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //get the link of the profile image from the storage and store the link in the database
+                            final String downloadUri = task.getResult().getDownloadUrl().toString();
+                            String saveCurrentTime;
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+                            saveCurrentTime = currentTime.format(calendar.getTime());
+                            Map messageTextBody = new HashMap();
+                            /**************************************************************************************/
+                            /**************************************************************************************/
+                            messageTextBody.put("message", downloadUri);
+                            //this is the message type and the text for just text messages i had to add another types
+                            messageTextBody.put("type", "image");
+                            messageTextBody.put("from", messageSenderID);
+                            messageTextBody.put("time", saveCurrentTime);
+
+                            Map messageBodyDetails = new HashMap();
+                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+
+                            rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
+                                @Override
+                                public void onComplete(@NonNull Task task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        } else {
+                            String message = task.getException().toString();
+                            Toast.makeText(ChatActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 555 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pickImage();
+        } else {
+            checkAndroidVersion();
+        }
+    }
+    //CROP REQUEST JAVA
+    private void cropRequest(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMultiTouchEnabled(true)
+                .start(this);
+    }
     private void sendMessage() {
         String messageText = messageInput.getText().toString();
         if(TextUtils.isEmpty(messageText)){
@@ -180,8 +286,6 @@ public class ChatActivity extends AppCompatActivity {
         userName = findViewById(R.id.custom_profile_name);
         lastSeen = findViewById(R.id.custom_last_seen);
         attach = findViewById(R.id.attach_button);
-        attachPop=new Dialog(this);
-        attachPop.setContentView(R.layout.attach_pop_up);
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
 
