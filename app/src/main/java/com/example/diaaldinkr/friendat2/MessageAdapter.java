@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +73,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 });
 
         if(fromMessageType.equals("text")){
+            messageViewHolder.receiverImageMessages.setVisibility(View.GONE);
+            messageViewHolder.senderImageMessages.setVisibility(View.GONE);
             String target_language=messages.getTo();
             Log.d(">>>", "onBindViewHolder: "+target_language);
             //Default variables for translation
@@ -116,7 +120,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
             }
         }else if(fromMessageType.equals("image")){
+            messageViewHolder.receiverMessageText.setVisibility(View.GONE);
+            messageViewHolder.receiverTranslatedMessageText.setVisibility(View.GONE);
+            messageViewHolder.senderMessageText.setVisibility(View.GONE);
+            messageViewHolder.senderTranslatedMessageText.setVisibility(View.GONE);
+            if(fromUserID.equals(messageSenderID)){
+                messageViewHolder.receiverImageMessages.setVisibility(View.GONE);
+                messageViewHolder.receiverMessageTime.setVisibility(View.GONE);
+                messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
 
+                messageViewHolder.senderImageMessages.setVisibility(View.VISIBLE);
+                messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+
+                messageViewHolder.senderImageMessages.setBackgroundResource(R.drawable.sender_messages_layout);
+                Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(messageViewHolder.senderImageMessages);
+                messageViewHolder.senderMessageTime.setText(messages.getTime());
+            }
+            else{
+                messageViewHolder.senderImageMessages.setVisibility(View.GONE);
+                messageViewHolder.senderMessageTime.setVisibility(View.GONE);
+
+                messageViewHolder.receiverImageMessages.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+
+                messageViewHolder.receiverImageMessages.setBackgroundResource(R.drawable.receiver_messages_layout);
+                Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverImageMessages);
+                messageViewHolder.receiverMessageTime.setText(messages.getTime());
+            }
         }
 
     }
@@ -165,6 +196,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public class  MessageViewHolder extends RecyclerView.ViewHolder{
         public TextView senderMessageText, receiverMessageText ,receiverMessageTime, senderMessageTime ,senderTranslatedMessageText, receiverTranslatedMessageText;
+        public ImageButton receiverImageMessages, senderImageMessages;
         public CircleImageView receiverProfileImage;
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -172,18 +204,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             senderMessageText = itemView.findViewById(R.id.sender_message_text);
             senderTranslatedMessageText = itemView.findViewById(R.id.sender_translated_message_text);
             senderMessageTime = itemView.findViewById(R.id.sender_message_time);
+            senderImageMessages = itemView.findViewById(R.id.sender_image_messages);
 
 
             receiverMessageText = itemView.findViewById(R.id.receiver_message_text);
             receiverTranslatedMessageText = itemView.findViewById(R.id.receiver_translated_message_text);
             receiverMessageTime = itemView.findViewById(R.id.receiver_message_time);
             receiverProfileImage = itemView.findViewById(R.id.message_profile_image);
+            receiverImageMessages = itemView.findViewById(R.id.receiver_image_messages);
 
             senderMessageText.setVisibility(View.GONE);
             receiverMessageText.setVisibility(View.GONE);
             receiverProfileImage.setVisibility(View.GONE);
             senderTranslatedMessageText.setVisibility(View.GONE);
             receiverTranslatedMessageText.setVisibility(View.GONE);
+            receiverImageMessages.setVisibility(View.GONE);
+            senderImageMessages.setVisibility(View.GONE);
         }
     }
 }

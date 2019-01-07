@@ -223,7 +223,11 @@ public class ChatActivity extends AppCompatActivity {
     private void cropRequest(Uri imageUri) {
         CropImage.activity(imageUri)
                 .setGuidelines(CropImageView.Guidelines.ON)
+                .setGuidelinesColor(R.color.colorPrimary)
                 .setMultiTouchEnabled(true)
+                .setCropMenuCropButtonIcon(R.drawable.ic_wite_send)
+                .setActivityTitle(messageReceiverName)
+                .setInitialCropWindowPaddingRatio(0)
                 .start(this);
     }
     private void sendMessage() {
