@@ -248,11 +248,11 @@ public class CreateGroupActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull final CreateGroupActivity.addContactsViewHolder holder, final int position, @NonNull final Contacts model) {
                 final String userIDs = getRef(position).getKey();
-                usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
+                usersRef.child(userIDs).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()){
-                                holder.onlineIcon.setVisibility(View.GONE);
+                            holder.onlineIcon.setVisibility(View.GONE);
                             if(dataSnapshot.hasChild("image")){
                                 String userImage = dataSnapshot.child("image").getValue().toString();
                                 String profileName = dataSnapshot.child("name").getValue().toString();
@@ -288,7 +288,6 @@ public class CreateGroupActivity extends AppCompatActivity {
                                 }
                             });
                         }
-
                     }
 
                     @Override
@@ -296,6 +295,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                     }
                 });
+
             }
 
             @NonNull

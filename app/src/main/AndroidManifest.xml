@@ -43,8 +43,8 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".CreateGroupActivity"
-            android:parentActivityName=".MainActivity">
-        </activity>
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".ImageViewerActivity"></activity>
     </application>
 
 </manifest>

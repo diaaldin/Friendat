@@ -309,7 +309,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void displayLastSeen(){
-        rootRef.child("Users").child(messageSenderID).addValueEventListener(new ValueEventListener() {
+        rootRef.child("Users").child(messageSenderID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //retrieve the last seen, the date and the time

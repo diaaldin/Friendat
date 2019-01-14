@@ -234,7 +234,7 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
     private void getUserInfo() {
-        usersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
+        usersRef.child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){

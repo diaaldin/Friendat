@@ -84,13 +84,13 @@ public class RequestsFragment extends Fragment {
                         final String list_user_id = getRef(position).getKey();
 
                         DatabaseReference typeRef = getRef(position).child("request_type").getRef();
-                        typeRef.addValueEventListener(new ValueEventListener() {
+                        typeRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(dataSnapshot.exists()) {
                                     String type = dataSnapshot.getValue().toString();
                                     if (type.equals("received")) {
-                                        usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                                        usersRef.child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -179,12 +179,12 @@ public class RequestsFragment extends Fragment {
 
                                             }
                                         });
+
                                     }else if(type.equals("sent")){
                                         Button requestSentBtn = holder.itemView.findViewById(R.id.request_decline_button);
                                         requestSentBtn.setText("Cancel chat request");
                                         holder.itemView.findViewById(R.id.request_accept_button).setVisibility(View.GONE);
-
-                                        usersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                                        usersRef.child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -230,6 +230,7 @@ public class RequestsFragment extends Fragment {
                                             }
                                         });
 
+
                                     }
                                 }
                             }
@@ -239,6 +240,7 @@ public class RequestsFragment extends Fragment {
 
                             }
                         });
+
                     }
 
                     @NonNull

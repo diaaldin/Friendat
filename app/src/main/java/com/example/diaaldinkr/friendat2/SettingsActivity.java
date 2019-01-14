@@ -249,48 +249,47 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void retrieveUserInfo() {
-        rootRef.child("Users").child(currentUserID)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        //if the user exist and he update the name and the status and the image
-                        if(dataSnapshot.exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("image")){
-                            //display the information
-                            String retrieveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retrieveStatus = dataSnapshot.child("status").getValue().toString();
-                            String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
-                            String retrieveLanguagesCode = dataSnapshot.child("lang_code").getValue().toString();
+        rootRef.child("Users").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //if the user exist and he update the name and the status and the image
+                if(dataSnapshot.exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("image")){
+                    //display the information
+                    String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                    String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+                    String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
+                    String retrieveLanguagesCode = dataSnapshot.child("lang_code").getValue().toString();
 
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveStatus);
-                            final List<String> languagesCode = new ArrayList<>(
-                                    Arrays.asList(" ","zh","es","en","hi","ar","pt","bn","ru","ja","pa","de","jv","he"));
+                    userName.setText(retrieveUserName);
+                    userStatus.setText(retrieveStatus);
+                    final List<String> languagesCode = new ArrayList<>(
+                            Arrays.asList(" ","zh","es","en","hi","ar","pt","bn","ru","ja","pa","de","jv","he"));
 
-                            spinner.setSelection(languagesCode.indexOf(retrieveLanguagesCode));
-                            Picasso.get().load(retrieveProfileImage).into(userProfileImage);
+                    spinner.setSelection(languagesCode.indexOf(retrieveLanguagesCode));
+                    Picasso.get().load(retrieveProfileImage).into(userProfileImage);
 
-                        }
-                        //if the user exist and he update the name and the status
-                        else if(dataSnapshot.exists() && dataSnapshot.hasChild("name")){
-                            String retrieveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+                }
+                //if the user exist and he update the name and the status
+                else if(dataSnapshot.exists() && dataSnapshot.hasChild("name")){
+                    String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                    String retrieveStatus = dataSnapshot.child("status").getValue().toString();
 
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveStatus);
+                    userName.setText(retrieveUserName);
+                    userStatus.setText(retrieveStatus);
 
-                        }
-                        //if the user is new or not update his information
-                        else{
-                            userName.setVisibility(View.VISIBLE);
-                            Toast.makeText(SettingsActivity.this,"Please update your profile ", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                }
+                //if the user is new or not update his information
+                else{
+                    userName.setVisibility(View.VISIBLE);
+                    Toast.makeText(SettingsActivity.this,"Please update your profile ", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+            }
+        });
     }
 
     private void sendUserToMainActivity() {

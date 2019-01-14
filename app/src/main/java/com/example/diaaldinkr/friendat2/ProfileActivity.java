@@ -57,8 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void retrieveUserInfo() {
-
-        userRef.child(receiverUserID).addValueEventListener(new ValueEventListener() {
+        userRef.child(receiverUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists() && dataSnapshot.hasChild("image")){
@@ -89,59 +88,57 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     private void manageChatRequests() {
-        chatRequestRef.child(senderUserID)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChild(receiverUserID)){
-                            String request_type = dataSnapshot.child(receiverUserID).child("request_type").getValue().toString();
+        chatRequestRef.child(senderUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild(receiverUserID)){
+                    String request_type = dataSnapshot.child(receiverUserID).child("request_type").getValue().toString();
 
-                            if(request_type.equals("sent")){
-                                currentState= "request_sent";
-                                sendMessageRequestButton.setText("Cancel chat request");
+                    if(request_type.equals("sent")){
+                        currentState= "request_sent";
+                        sendMessageRequestButton.setText("Cancel chat request");
+                    }
+                    else if(request_type.equals("received")){
+                        currentState = "request_received";
+                        sendMessageRequestButton.setText("Accept chat request");
+
+                        declineMessageRequestButton.setVisibility(View.VISIBLE);
+                        declineMessageRequestButton.setEnabled(true);
+                        declineMessageRequestButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                cancelChatRequest();
                             }
-                            else if(request_type.equals("received")){
-                                currentState = "request_received";
-                                sendMessageRequestButton.setText("Accept chat request");
+                        });
+                    }
 
-                                declineMessageRequestButton.setVisibility(View.VISIBLE);
-                                declineMessageRequestButton.setEnabled(true);
-                                declineMessageRequestButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        cancelChatRequest();
-                                    }
-                                });
+                }else{
+                    contactsRef.child(senderUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.hasChild(receiverUserID)){
+                                currentState= "friends";
+                                sendMessageRequestButton.setText("Remove contact");
+
                             }
-
-                        }else{
-                            contactsRef.child(senderUserID).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if(dataSnapshot.hasChild(receiverUserID)){
-                                        currentState= "friends";
-                                        sendMessageRequestButton.setText("Remove contact");
-
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         if(!senderUserID.equals(receiverUserID)){
             sendMessageRequestButton.setOnClickListener(new View.OnClickListener() {

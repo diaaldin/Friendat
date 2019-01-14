@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ImageViewerActivity"
+    android:background="@android:color/black">
+
+    <include
+        layout="@layout/image_viewer_bar_layout"
+        android:id="@+id/imageViewer_toolbar">
+    </include>
+
+    <ImageView
+        android:id="@+id/imageViewer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/imageViewer_toolbar"
+        app:srcCompat="@drawable/default_image" />
+</RelativeLayout>

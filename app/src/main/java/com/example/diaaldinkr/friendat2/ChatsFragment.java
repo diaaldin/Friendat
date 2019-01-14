@@ -70,8 +70,7 @@ public class ChatsFragment extends Fragment {
                         final String userIDs = getRef(position).getKey();
                         final String[] userImage = {"default_image"};
                         final String userLangCode ;
-
-                        usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
+                        usersRef.child(userIDs).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(dataSnapshot.exists()){

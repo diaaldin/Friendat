@@ -71,7 +71,7 @@ public class ContactsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull final ContactsViewHolder holder, int position, @NonNull final Contacts model) {
                 String userIDs = getRef(position).getKey();
-                usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
+                usersRef.child(userIDs).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()){
@@ -108,7 +108,6 @@ public class ContactsFragment extends Fragment {
 
                             }
                         }
-
                     }
 
                     @Override

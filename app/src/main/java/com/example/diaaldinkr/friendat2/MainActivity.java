@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void VerifyUserExistence() {
         String currentUserID=mAuth.getCurrentUser().getUid();
-        rootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
+        rootRef.child("Users").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //if the user is not a new user and he update his profile
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
 
     }
 

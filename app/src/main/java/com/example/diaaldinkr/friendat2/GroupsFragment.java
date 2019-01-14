@@ -81,7 +81,7 @@ public class GroupsFragment extends Fragment {
                     protected void onBindViewHolder(@NonNull final GroupsFragment.GroupsViewHolder holder, final int position, @NonNull Contacts model) {
                         final String groupIDs = getRef(position).getKey();
                         final String[] groupImage = {"default_image"};
-                        groupRef.child(groupIDs).addValueEventListener(new ValueEventListener() {
+                        groupRef.child(groupIDs).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.exists()) {
@@ -95,7 +95,7 @@ public class GroupsFragment extends Fragment {
                                     final String groupName = dataSnapshot.child("group_name").getValue().toString();
                                     Log.d(">>>", "onCreateView: " + groupName);
                                     holder.groupName.setText(groupName);
-                                    groupMembersRef.child(groupIDs).child("group_members").child(currentUserID).addValueEventListener(new ValueEventListener() {
+                                    groupMembersRef.child(groupIDs).child("group_members").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.exists()) {
@@ -114,6 +114,7 @@ public class GroupsFragment extends Fragment {
 
                                         }
                                     });
+
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -126,7 +127,6 @@ public class GroupsFragment extends Fragment {
                                     });
                                 }
                             }
-
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {

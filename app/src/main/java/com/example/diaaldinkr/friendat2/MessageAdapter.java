@@ -1,6 +1,7 @@
 package com.example.diaaldinkr.friendat2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -52,25 +53,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i) {
         //retrieve and display the messages
         String messageSenderID = mAuth.getCurrentUser().getUid();
-        Messages messages = userMessagesList.get(i);
-        String fromUserID = messages.getFrom();
+        final Messages messages = userMessagesList.get(i);
+        final String fromUserID = messages.getFrom();
         String fromMessageType = messages.getType();
         String messageTime = messages.getTime();
 
         userRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        userRef.child(fromUserID).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild("image")){
-                            String receiverImage = dataSnapshot.child("image").getValue().toString();
-                            Picasso.get().load(receiverImage).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverProfileImage);
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+        userRef.child(fromUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild("image")){
+                    String receiverImage = dataSnapshot.child("image").getValue().toString();
+                    Picasso.get().load(receiverImage).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverProfileImage);
+                }
+            }
 
-                    }
-                });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         if(fromMessageType.equals("text")){
             messageViewHolder.receiverImageMessages.setVisibility(View.GONE);
@@ -135,6 +137,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.senderImageMessages.setBackgroundResource(R.drawable.sender_messages_layout);
                 Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(messageViewHolder.senderImageMessages);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
+                messageViewHolder.senderImageMessages.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent imageViewerIntent = new Intent(context.getApplicationContext(),ImageViewerActivity.class);
+                        imageViewerIntent.putExtra("image",messages.getMessage());
+                        imageViewerIntent.putExtra("sender_id",fromUserID);
+                        context.startActivity(imageViewerIntent);
+                    }
+                });
             }
             else{
                 messageViewHolder.senderImageMessages.setVisibility(View.GONE);
@@ -147,6 +158,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverImageMessages.setBackgroundResource(R.drawable.receiver_messages_layout);
                 Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverImageMessages);
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
+                messageViewHolder.receiverImageMessages.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent imageViewerIntent = new Intent(context.getApplicationContext(),ImageViewerActivity.class);
+                        imageViewerIntent.putExtra("image",messages.getMessage());
+                        imageViewerIntent.putExtra("sender_id",fromUserID);
+                        context.startActivity(imageViewerIntent);
+                    }
+                });
             }
         }
 
