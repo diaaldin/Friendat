@@ -1,8 +1,8 @@
 package com.example.diaaldinkr.friendat2;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,20 +10,27 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,16 +46,12 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
@@ -56,7 +59,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView userName, lastSeen;
     private CircleImageView userImage;
     private Toolbar chatToolBar;
-    private FloatingActionButton sendMessageButton;
+    private Button sendMessageButton;
     private EditText messageInput;
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
@@ -67,8 +70,10 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView userMessagesList;
     private ImageButton attach;
     private  Uri resultUri;
+    private Button recordButton;
     private boolean pick = false;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,12 +91,34 @@ public class ChatActivity extends AppCompatActivity {
         userName.setText(messageReceiverName);
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
         usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
+
+
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessage();
             }
         });
+
+        recordButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                float y=0;
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    y = event.getY();
+                    Log.d("record", "Start Recording...");
+                }else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    Log.d("record", "Stop Recording...");
+                }else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    float c=event.getY();
+                    if (c < y-50) {
+                        Log.d("record", "delete Record...");
+                    }
+                }
+                return true;
+            }
+        });
+
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
@@ -124,12 +151,51 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
+        final boolean[] enter = {true};
+        messageInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d(">>>", "onTextChanged: "+s);
+                if (messageInput.getText().toString().trim().length() > 0) {
+                    if (enter[0]) {
+                        YoYo.with(Techniques.FlipInY)
+                                .duration(400)
+                                .repeat(0)
+                                .playOn(sendMessageButton);
+                        enter[0] = false;
+                    }
+                    recordButton.setVisibility(View.GONE);
+                    sendMessageButton.setVisibility(View.VISIBLE);
+                } else if (messageInput.getText().toString().length() == 0) {
+                    YoYo.with(Techniques.FlipInX)
+                            .duration(400)
+                            .repeat(0)
+                            .playOn(recordButton);
+                    recordButton.setVisibility(View.VISIBLE);
+                    sendMessageButton.setVisibility(View.GONE);
+                    enter[0] = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         attach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkAndroidVersion();
             }
         });
+        String space="  ";
+        Log.d("IMPORTANT", "SIZE: "+space.trim().length());
     }
     private void checkAndroidVersion(){
         //REQUEST PERMISSION
@@ -225,13 +291,13 @@ public class ChatActivity extends AppCompatActivity {
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setGuidelinesColor(R.color.colorPrimary)
                 .setMultiTouchEnabled(true)
-                .setCropMenuCropButtonIcon(R.drawable.ic_wite_send)
+                .setCropMenuCropButtonIcon(R.drawable.ic_send)
                 .setActivityTitle(messageReceiverName)
                 .setInitialCropWindowPaddingRatio(0)
                 .start(this);
     }
     private void sendMessage() {
-        String messageText = messageInput.getText().toString();
+        String messageText = messageInput.getText().toString().trim();
         if(TextUtils.isEmpty(messageText)){
             Toast.makeText(this, "write a message first", Toast.LENGTH_SHORT).show();
         }else{
@@ -292,6 +358,8 @@ public class ChatActivity extends AppCompatActivity {
         attach = findViewById(R.id.attach_button);
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
+
+        recordButton =  findViewById(R.id.record_button);
 
         userMessagesList = findViewById(R.id.private_messages_list);
         messageAdapter = new MessageAdapter(messagesList, getApplicationContext());

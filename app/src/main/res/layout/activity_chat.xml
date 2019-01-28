@@ -23,54 +23,65 @@
         android:paddingBottom="5dp">
 
     </android.support.v7.widget.RecyclerView>
-<LinearLayout
-    android:id="@+id/chat_linear_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentStart="true"
-    android:orientation="horizontal"
-    android:background="@color/transparent">
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_weight="7"
-        android:layout_height="match_parent"
-        android:background="@drawable/inputs2"
-        android:orientation="horizontal"
-        android:paddingEnd="11dp">
-
-        <EditText
-            android:id="@+id/input_message"
-            android:layout_width="0dp"
-            android:layout_weight="10"
-            android:layout_height="match_parent"
-            android:hint="@string/type_message_here"
-            android:isScrollContainer="true"
-            android:inputType="textMultiLine"
-            android:maxLength="1500"
-            android:maxLines="6"
-            android:paddingStart="20dp"
-            android:padding="4dp"
-            android:background="@null"
-            android:textColorHint="@android:color/black"
-             />
-
-        <ImageButton
-            android:id="@+id/attach_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="5dp"
-            app:srcCompat="@drawable/attach_file" />
-    </LinearLayout>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/send_message_btn"
-        android:layout_width="wrap_content"
+        android:id="@+id/chat_linear_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:src="@drawable/send_black_48dp"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:layout_margin="7dp" />
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        android:background="@color/transparent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_weight="7"
+            android:layout_height="match_parent"
+            android:background="@drawable/inputs2"
+            android:orientation="horizontal"
+            android:paddingEnd="11dp">
 
+            <EditText
+                android:id="@+id/input_message"
+                android:layout_width="0dp"
+                android:layout_weight="10"
+                android:layout_height="match_parent"
+                android:hint="@string/type_message_here"
+                android:isScrollContainer="true"
+                android:inputType="textMultiLine"
+                android:maxLength="1500"
+                android:maxLines="6"
+                android:paddingStart="20dp"
+                android:padding="4dp"
+                android:background="@null"
+                android:textColorHint="@android:color/white"
+                />
+
+            <ImageButton
+                android:id="@+id/attach_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                app:srcCompat="@drawable/attach_file" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/send_message_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/ripple_oval"
+            android:drawableStart="@drawable/ic_send"
+            android:padding="12dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/record_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/ripple_oval"
+            android:drawableStart="@drawable/ic_record"
+            android:padding="12dp"
+            android:visibility="visible"/>
+
+
+    </LinearLayout>
 </RelativeLayout>
