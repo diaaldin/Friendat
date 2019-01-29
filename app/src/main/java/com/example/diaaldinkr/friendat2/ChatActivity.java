@@ -6,10 +6,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,12 +51,18 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
@@ -64,6 +75,7 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
     private StorageReference usersImagesMessagesRef;
+    private StorageReference usersAudiosMessagesRef;
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
@@ -72,6 +84,11 @@ public class ChatActivity extends AppCompatActivity {
     private  Uri resultUri;
     private Button recordButton;
     private boolean pick = false;
+    private MediaRecorder mediaRecorder;
+    private String pathSave;
+    final int REQUEST_PERMISSION_CODE = 1000;
+    private MediaPlayer mediaPlayer;
+    private boolean stopped =true;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -90,8 +107,9 @@ public class ChatActivity extends AppCompatActivity {
         initializeControllers();
         userName.setText(messageReceiverName);
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
-        usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
 
+        usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
+        usersAudiosMessagesRef = FirebaseStorage.getInstance().getReference().child("Audio Messages");
 
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,12 +125,30 @@ public class ChatActivity extends AppCompatActivity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     y = event.getY();
                     Log.d("record", "Start Recording...");
+                    Toast.makeText(ChatActivity.this, "Start Recording...", Toast.LENGTH_SHORT).show();
+                    if(checkPermissionFromDevice()){
+                        setupMediaRecorder();
+                        mediaRecorder.start();
+                        stopped=false;
+                    }else{
+                        requestPermission();
+                    }
+
                 }else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    Log.d("record", "Stop Recording...");
+                    if (!stopped) {
+                        Log.d("record", "Stop Recording...");
+                        mediaRecorder.stop();
+                        stopped = true;
+                       uploadAudio();
+                    }
                 }else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                     float c=event.getY();
                     if (c < y-50) {
-                        Log.d("record", "delete Record...");
+                        if (!stopped) {
+                            Log.d("record", "delete Record...");
+                            mediaRecorder.stop();
+                            stopped=true;
+                        }
                     }
                 }
                 return true;
@@ -197,6 +233,52 @@ public class ChatActivity extends AppCompatActivity {
         String space="  ";
         Log.d("IMPORTANT", "SIZE: "+space.trim().length());
     }
+
+    private void uploadAudio() {
+        Uri audioURI = Uri.fromFile(new File(pathSave));
+        DatabaseReference userMessageKeyRef = rootRef.child("Messages").child(messageSenderID)
+                .child(messageReceiverID).push();
+        //this key used to store the messages
+        final String messagePushID = userMessageKeyRef.getKey();
+        StorageReference filePath = usersAudiosMessagesRef.child(messagePushID + ".3gp");
+        filePath.putFile(audioURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+            }
+        });
+    }
+
+    private void setupMediaRecorder() {
+        pathSave = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"
+                + UUID.randomUUID().toString()+"_audio_record.3gp";
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setOutputFile(pathSave);
+        mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+        try {
+            mediaRecorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this,new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO
+        },REQUEST_PERMISSION_CODE);
+    }
+
+
+    private boolean checkPermissionFromDevice() {
+        int record_audio_result = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        int write_external_storage_result = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        return write_external_storage_result==PackageManager.PERMISSION_GRANTED &&
+                record_audio_result==PackageManager.PERMISSION_GRANTED;
+    }
+
     private void checkAndroidVersion(){
         //REQUEST PERMISSION
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
