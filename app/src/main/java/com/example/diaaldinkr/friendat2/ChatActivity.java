@@ -107,7 +107,6 @@ public class ChatActivity extends AppCompatActivity {
         initializeControllers();
         userName.setText(messageReceiverName);
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
-
         usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
         usersAudiosMessagesRef = FirebaseStorage.getInstance().getReference().child("Audio Messages");
 
@@ -147,6 +146,7 @@ public class ChatActivity extends AppCompatActivity {
                         if (!stopped) {
                             Log.d("record", "delete Record...");
                             mediaRecorder.stop();
+                            mediaRecorder.reset();
                             stopped=true;
                         }
                     }
@@ -159,7 +159,6 @@ public class ChatActivity extends AppCompatActivity {
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Log.d(">>>", "onChildAdded: "+ dataSnapshot.getValue());
                         Messages messages = dataSnapshot.getValue(Messages.class);
                         messagesList.add(messages);
                         messageAdapter.notifyDataSetChanged();
@@ -196,7 +195,6 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d(">>>", "onTextChanged: "+s);
                 if (messageInput.getText().toString().trim().length() > 0) {
                     if (enter[0]) {
                         YoYo.with(Techniques.FlipInY)
@@ -238,20 +236,65 @@ public class ChatActivity extends AppCompatActivity {
         Uri audioURI = Uri.fromFile(new File(pathSave));
         DatabaseReference userMessageKeyRef = rootRef.child("Messages").child(messageSenderID)
                 .child(messageReceiverID).push();
+
+        final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
+        final String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
         //this key used to store the messages
         final String messagePushID = userMessageKeyRef.getKey();
         StorageReference filePath = usersAudiosMessagesRef.child(messagePushID + ".3gp");
         filePath.putFile(audioURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    //get the link of the profile image from the storage and store the link in the database
+                    final String downloadUri = task.getResult().getDownloadUrl().toString();
+                    String saveCurrentTime;
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+                    saveCurrentTime = currentTime.format(calendar.getTime());
+                    Map messageTextBody = new HashMap();
+                    /**************************************************************************************/
+                    /**************************************************************************************/
+                    messageTextBody.put("message", downloadUri);
+                    //this is the message type and the text for just text messages i had to add another types
+                    messageTextBody.put("type", "audio");
+                    messageTextBody.put("from", messageSenderID);
+                    messageTextBody.put("time", saveCurrentTime);
 
+                    Map messageBodyDetails = new HashMap();
+                    messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
+                    messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+
+                    rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
+                        @Override
+                        public void onComplete(@NonNull Task task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+                    String message = task.getException().toString();
+                    Toast.makeText(ChatActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
     private void setupMediaRecorder() {
-        pathSave = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"
-                + UUID.randomUUID().toString()+"_audio_record.3gp";
+        //make directory
+        String sep = File.separator; // Use this instead of hardcoding the "/"
+        String friendatFolder = "Friendat";
+        String mediaFolder = "Media";
+        String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
+        File myFriendatFolder = new File(extStorageDirectory + sep + friendatFolder);
+        myFriendatFolder.mkdir();
+        File myMediaFolder = new File(extStorageDirectory + sep + friendatFolder+ sep + mediaFolder);
+        myMediaFolder.mkdir();
+        pathSave = Environment.getExternalStorageDirectory().toString()
+                + sep + friendatFolder + sep + mediaFolder + sep + UUID.randomUUID().toString()+ "_audio_record.3gp";
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
