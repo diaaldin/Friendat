@@ -16,4 +16,9 @@
     <string name="receiver_messages">receiver messages</string>
     <string name="time">time</string>
     <string name="sender_messages">sender_group messages</string>
+    <string name="receiver_image_messages">receiver_image_messages</string>
+    <string name="receiver_play_record">receiver_play_record</string>
+    <string name="receiver_translated_messages">receiver translated messages</string>
+    <string name="sender_image_messages">sender_image_messages</string>
+    <string name="sender_play_record">sender_play_record</string>
 </resources>

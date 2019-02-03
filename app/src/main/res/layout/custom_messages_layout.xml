@@ -41,24 +41,27 @@
                         android:padding="5dp"
                         android:layout_margin="5dp"
                         app:srcCompat="@drawable/profile_image"
-                        android:visibility="gone"/>
+                        android:visibility="gone"
+                        android:contentDescription="@string/receiver_image_messages" />
                 </LinearLayout>
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     >
 
                     <ImageView
                         android:id="@+id/receiver_play_record"
                         android:layout_width="37dp"
                         android:layout_height="37dp"
-                        app:srcCompat="@drawable/ic_play" />
+                        app:srcCompat="@drawable/ic_play"
+                        android:contentDescription="@string/receiver_play_record" />
 
                     <TextView
                         android:id="@+id/receiver_record_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00:00"
+                        android:text="@string/time"
                         android:padding="10dp"
                         android:textSize="14sp"
                         android:textColor="@android:color/background_light"
@@ -68,7 +71,7 @@
                     android:id="@+id/receiver_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="receiver messages"
+                    android:text="@string/receiver_messages"
                     android:padding="10dp"
                     android:textSize="14sp"
                     android:textColor="@android:color/background_light"
@@ -79,7 +82,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|bottom"
                     android:layout_marginEnd="15dp"
-                    android:text="10:10"
+                    android:text="@string/time"
                     android:textColor="@android:color/background_light"
                     android:textSize="12sp" />
 
@@ -98,7 +101,7 @@
                 android:id="@+id/receiver_translated_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="receiver translated messages"
+                android:text="@string/receiver_translated_messages"
                 android:padding="10dp"
                 android:textSize="14sp"
                 android:textColor="@android:color/background_light"/>
@@ -134,7 +137,8 @@
                     android:padding="5dp"
                     android:layout_margin="5dp"
                     app:srcCompat="@drawable/profile_image"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    android:contentDescription="@string/sender_image_messages" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="100dp"
@@ -145,13 +149,14 @@
                     android:layout_width="37dp"
                     android:layout_height="37dp"
                     app:srcCompat="@drawable/ic_play"
-                    android:visibility="visible"/>
+                    android:visibility="visible"
+                    android:contentDescription="@string/sender_play_record" />
 
                 <TextView
                     android:id="@+id/sender_record_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
+                    android:text="@string/time"
                     android:padding="10dp"
                     android:textSize="14sp"
                     android:textColor="@android:color/background_light"
@@ -161,7 +166,7 @@
                 android:id="@+id/sender_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="sender messages"
+                android:text="@string/sender_messages"
                 android:padding="10dp"
                 android:textSize="14sp"
                 android:textColor="@android:color/background_light"/>
@@ -171,7 +176,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|bottom"
                 android:paddingEnd="15dp"
-                android:text="10:10"
+                android:paddingStart="1dp"
+                android:text="@string/time"
                 android:textColor="@android:color/background_light"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -188,7 +194,7 @@
                 android:id="@+id/sender_translated_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="sender messages"
+                android:text="@string/sender_messages"
                 android:padding="10dp"
                 android:textSize="14sp"
                 android:textColor="@android:color/background_light"/>
