@@ -8,6 +8,6 @@ Please visit our [wiki](../../wiki) for furthur project info:
 
 ### [Missions Board](https://github.com/diaaldin/Friendat/projects)
 ### [My Diary](https://github.com/diaaldin/Friendat/wiki/Diary)
-### [The XML code]()
-### [The Java code]()
+### [The XML code](https://github.com/diaaldin/Friendat/tree/master/app/src/main/res/layout)
+### [The Java code](https://github.com/diaaldin/Friendat/tree/master/app/src/main/java/com/example/diaaldinkr/friendat2)
 
