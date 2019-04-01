@@ -8,7 +8,6 @@ Please visit our [wiki](../../wiki) for furthur project info:
 
 ### [Missions Board](https://github.com/diaaldin/Friendat/projects)
 ### [My Diary](https://github.com/diaaldin/Friendat/wiki/Diary)
-### Project Documents:
-- [Project Inception](https://github.com/diaaldin/Friendat/wiki/Inception-Planning)
-- [Software Requirements Specification]()
-- [Software Design Specification]()
+### [The XML code]()
+### [The Java code]()
+
