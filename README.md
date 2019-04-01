@@ -1,3 +1,6 @@
+
+<p style="text-align:center;">                                                                                                         <img src="https://raw.githubusercontent.com/diaaldin/Friendat/master/logo.PNG" width="250dp" height="250dp" ></p>
+
 # Friendat:
 Friendat is a chat application made in android platform 
 
