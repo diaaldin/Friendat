@@ -1,3 +1,5 @@
+
+// This class is to define all the attributes of user contacts
 package com.example.diaaldinkr.friendat2;
 
 public class Contacts {

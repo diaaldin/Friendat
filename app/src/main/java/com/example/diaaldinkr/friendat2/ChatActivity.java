@@ -1,5 +1,21 @@
+
+
+/* This class is to Send text messages or audio records or pictures
+ * Here I check the permissions for the camera and the microphone to take pictures and record audio
+ * I save all the messages in the firebase database and save the images and the records in the firebase storage
+ * and save the downloaded links in the firebase database
+ * also i save the images and the records in the device storage
+ * also checking the status of the users (online, offline or typing ) */
+
+
+
+
+
 package com.example.diaaldinkr.friendat2;
 
+/*
+Imports
+*/
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -29,11 +45,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -51,10 +65,8 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,10 +74,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
+    /*
+    Variables
+    */
     private  String messageReceiverID, messageReceiverName, messageReceiverLangCode, messageReceiverImage, messageSenderID;
     private TextView userName, lastSeen;
     private CircleImageView userImage;
@@ -110,13 +124,18 @@ public class ChatActivity extends AppCompatActivity {
         usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
         usersAudiosMessagesRef = FirebaseStorage.getInstance().getReference().child("Audio Messages");
 
+        /*
+        Click listener for the send message button
+        */
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessage();
             }
         });
-
+        /*
+        Click listener for the record audio button
+        */
         recordButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -138,7 +157,7 @@ public class ChatActivity extends AppCompatActivity {
                         Log.d("record", "Stop Recording...");
                         mediaRecorder.stop();
                         stopped = true;
-                       uploadAudio();
+                        uploadAudio();
                     }
                 }else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                     float c=event.getY();
@@ -154,7 +173,9 @@ public class ChatActivity extends AppCompatActivity {
                 return true;
             }
         });
-
+        /*
+        Retrieve the messages from the database
+        */
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
@@ -186,6 +207,9 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
+        /*
+        Check if the user start to type message
+        */
         final boolean[] enter = {true};
         messageInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -228,10 +252,10 @@ public class ChatActivity extends AppCompatActivity {
                 checkAndroidVersion();
             }
         });
-        String space="  ";
-        Log.d("IMPORTANT", "SIZE: "+space.trim().length());
     }
-
+    /*
+        In this method I upload the recorded audio to the firebase storage and save the link in the firebase database
+    */
     private void uploadAudio() {
         Uri audioURI = Uri.fromFile(new File(pathSave));
         DatabaseReference userMessageKeyRef = rootRef.child("Messages").child(messageSenderID)
@@ -282,7 +306,9 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-
+    /*
+        In this method I save the recorded audio in directory in the phone
+    */
     private void setupMediaRecorder() {
         //make directory
         String sep = File.separator; // Use this instead of hardcoding the "/"
@@ -306,7 +332,9 @@ public class ChatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
+    /*
+      In this method to request permission from the user to record audio and use external storage
+    */
     private void requestPermission() {
         ActivityCompat.requestPermissions(this,new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -346,7 +374,7 @@ public class ChatActivity extends AppCompatActivity {
             cropRequest(imageUri);
         }
 
-        //RESULT FROM CROPING ACTIVITY
+        //RESULT FROM CROPPING ACTIVITY
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {

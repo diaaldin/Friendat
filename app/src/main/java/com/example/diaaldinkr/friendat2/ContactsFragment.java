@@ -1,3 +1,7 @@
+
+/* This class is used for retrieve and display all the Contact from the firebase storage
+ */
+
 package com.example.diaaldinkr.friendat2;
 
 

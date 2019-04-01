@@ -1,5 +1,8 @@
-package com.example.diaaldinkr.friendat2;
 
+
+/* This class is used for retrieve and display all the chats from the firebase storage
+*/
+package com.example.diaaldinkr.friendat2;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
 
 /**
  * A simple {@link Fragment} subclass.
