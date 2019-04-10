@@ -12,9 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by DoguD on 01/07/2017.
- */
 
 public class TranslatorBackgroundTask extends AsyncTask<String, Void, String> {
     //Declare Context

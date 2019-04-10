@@ -110,11 +110,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
 
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
-              //  messageViewHolder.senderTranslatedMessageText.setVisibility(View.VISIBLE);
+                //  messageViewHolder.senderTranslatedMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
 
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-            //    messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
+                //    messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
                 messageViewHolder.senderMessageText.setText(messages.getMessage());
                 //messageViewHolder.senderTranslatedMessageText.setText(TranslatedText);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
@@ -125,7 +125,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.senderMessageTime.setVisibility(View.GONE);
 
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
-               // messageViewHolder.receiverTranslatedMessageText.setVisibility(View.VISIBLE);
+                // messageViewHolder.receiverTranslatedMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
 
