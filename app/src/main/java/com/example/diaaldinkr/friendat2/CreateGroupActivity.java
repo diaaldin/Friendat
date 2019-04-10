@@ -1,7 +1,7 @@
 
 /*This class is used for create groups
 * Save all the information of the group in the firebase storage
-* Information like name, image and users of the group
+* Information like name, image and members of the group
 */
 
 package com.example.diaaldinkr.friendat2;
@@ -278,7 +278,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(View v) {
                                     holder.itemView.setBackgroundColor(ContextCompat.getColor(CreateGroupActivity.this, R.color.list_item_normal_state));
-                                    if(groupUsersID.size()>0)
+                                    if(groupUsersID.size()>0 && groupUsersID.contains(userIDs))
                                         groupUsersID.remove(position);
                                     else
                                         Toast.makeText(CreateGroupActivity.this, "Add friends first -_- ", Toast.LENGTH_SHORT).show();

@@ -1,10 +1,15 @@
-package com.example.diaaldinkr.friendat2;
+/*
+    In this Activity create image viewer to open the image when we click on it
+    the activity receive the URI of the image from the chat activity and display it on the screen
+    using Picasso library
+ */
 
+
+package com.example.diaaldinkr.friendat2;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

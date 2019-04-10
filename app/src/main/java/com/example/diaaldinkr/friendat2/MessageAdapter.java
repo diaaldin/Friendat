@@ -163,6 +163,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         Intent imageViewerIntent = new Intent(context.getApplicationContext(),ImageViewerActivity.class);
                         imageViewerIntent.putExtra("image",messages.getMessage());
                         imageViewerIntent.putExtra("sender_id",fromUserID);
+                        imageViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(imageViewerIntent);
                     }
                 });
@@ -183,6 +184,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         Intent imageViewerIntent = new Intent(context.getApplicationContext(),ImageViewerActivity.class);
                         imageViewerIntent.putExtra("image",messages.getMessage());
                         imageViewerIntent.putExtra("sender_id",fromUserID);
+                        imageViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(imageViewerIntent);
                     }
                 });
