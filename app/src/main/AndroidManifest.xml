@@ -15,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".VideoViewer"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,8 +45,8 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".CreateGroupActivity"
-            android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".ImageViewerActivity"></activity>
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".ImageViewerActivity" />
     </application>
 
 </manifest>

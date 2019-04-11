@@ -62,6 +62,14 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 app:srcCompat="@drawable/attach_file" />
+            <ImageButton
+                android:id="@+id/pick_video_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                app:srcCompat="@drawable/ic_video"
+                tools:ignore="VectorDrawableCompat" />
         </LinearLayout>
 
         <Button

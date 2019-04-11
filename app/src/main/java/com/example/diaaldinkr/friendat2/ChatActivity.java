@@ -84,23 +84,24 @@ public class ChatActivity extends AppCompatActivity {
     private TextView userName, lastSeen;
     private CircleImageView userImage;
     private Toolbar chatToolBar;
-    private Button sendMessageButton;
+    private Button sendMessageButton, recordButton;
     private EditText messageInput;
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
     private StorageReference usersImagesMessagesRef;
     private StorageReference usersAudiosMessagesRef;
+    private StorageReference usersVideosMessagesRef;
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
-    private ImageButton attach;
+    private ImageButton attach ,sendVideo;
     private  Uri resultUri;
-    private Button recordButton;
     private boolean pick = false;
     private MediaRecorder mediaRecorder;
     private String pathSave;
     final int REQUEST_PERMISSION_CODE = 1000;
+    final int PICK_VIDEO_CODE = 94;
     private MediaPlayer mediaPlayer;
     private boolean stopped =true;
 
@@ -123,6 +124,7 @@ public class ChatActivity extends AppCompatActivity {
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
         usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
         usersAudiosMessagesRef = FirebaseStorage.getInstance().getReference().child("Audio Messages");
+        usersVideosMessagesRef = FirebaseStorage.getInstance().getReference().child("Video Messages");
 
         /*
         Click listener for the send message button
@@ -131,6 +133,13 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendMessage();
+            }
+        });
+
+        sendVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendVideo();
             }
         });
         /*
@@ -253,6 +262,15 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void sendVideo() {
+        startActivityForResult(Intent.createChooser(new Intent().
+                setAction(Intent.ACTION_GET_CONTENT).
+                setType("video/mp4"),
+                "selecton video"),
+                PICK_VIDEO_CODE);
+    }
+
     /*
         In this method I upload the recorded audio to the firebase storage and save the link in the firebase database
     */
@@ -429,6 +447,58 @@ public class ChatActivity extends AppCompatActivity {
                 });
             }
         }
+
+        if( requestCode == PICK_VIDEO_CODE && resultCode == Activity.RESULT_OK){
+            resultUri = data.getData();
+            //store the image inside the firebase storage
+            final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
+            final String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
+
+            DatabaseReference userMessageKeyRef = rootRef.child("Messages").child(messageSenderID)
+                    .child(messageReceiverID).push();
+            //this key used to store the messages
+            final String messagePushID = userMessageKeyRef.getKey();
+            StorageReference filePath = usersVideosMessagesRef.child(messagePushID + ".mp4");
+            filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        //get the link of the profile image from the storage and store the link in the database
+                        final String downloadUri = task.getResult().getDownloadUrl().toString();
+                        String saveCurrentTime;
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+                        saveCurrentTime = currentTime.format(calendar.getTime());
+                        Map messageTextBody = new HashMap();
+                        /**************************************************************************************/
+                        /**************************************************************************************/
+                        messageTextBody.put("message", downloadUri);
+                        //this is the message type and the text for just text messages i had to add another types
+                        messageTextBody.put("type", "video");
+                        messageTextBody.put("from", messageSenderID);
+                        messageTextBody.put("time", saveCurrentTime);
+
+                        Map messageBodyDetails = new HashMap();
+                        messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
+                        messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+
+                        rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    } else {
+                        String message = task.getException().toString();
+                        Toast.makeText(ChatActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -509,6 +579,7 @@ public class ChatActivity extends AppCompatActivity {
         userName = findViewById(R.id.custom_profile_name);
         lastSeen = findViewById(R.id.custom_last_seen);
         attach = findViewById(R.id.attach_button);
+        sendVideo = findViewById(R.id.pick_video_button);
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
 

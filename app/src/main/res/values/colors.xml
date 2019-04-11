@@ -8,7 +8,7 @@
     <color name="colorReceiver">#1B283F</color>
     <color name="colorTranslatedReceiver">#1B283F85</color>
     <color name="transparent">#90D4D2D4</color>
-    <color name="transparent2">#000000</color>
+    <color name="transparent2">#000000AA</color>
     <color name="list_item_selected_state">#D4D2D4</color>
     <color name="list_item_normal_state">#FFFFFF</color>
 </resources>

@@ -18,6 +18,7 @@
                 android:layout_height="45dp"
                 android:layout_marginTop="10dp"
                 android:src="@drawable/profile_image"/>
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -26,6 +27,30 @@
                 android:layout_marginEnd="50dp"
                 android:minWidth="75dp"
                 android:orientation="vertical">
+                <FrameLayout
+                    android:id="@+id/video_frame"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:visibility="gone">
+                    <VideoView
+                        android:layout_width="250dp"
+                        android:layout_height="350dp"
+                        android:id="@+id/receiver_video_layout"
+                        android:visibility="gone"
+                        />
+                    <ImageButton
+                        android:id="@+id/play_video"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:src="@drawable/ic_play"
+                        android:background="@color/transparent2"
+                        android:scaleType="fitXY"
+                        android:visibility="gone"
+                        />
+                </FrameLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -122,6 +147,29 @@
             android:layout_gravity="end"
             android:minWidth="75dp"
             android:orientation="vertical">
+            <FrameLayout
+                android:id="@+id/video_frame2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:visibility="gone">
+                <VideoView
+                    android:layout_width="250dp"
+                    android:layout_height="350dp"
+                    android:id="@+id/sender_video_layout"
+                    android:visibility="gone"
+                    />
+                <ImageButton
+                    android:id="@+id/play_video2"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:src="@drawable/ic_play"
+                    android:background="@color/transparent2"
+                    android:scaleType="fitXY"
+                    android:visibility="gone"
+                    />
+            </FrameLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
