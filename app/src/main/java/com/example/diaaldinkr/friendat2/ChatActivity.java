@@ -229,23 +229,23 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (messageInput.getText().toString().trim().length() > 0) {
-                    if (enter[0]) {
-                        YoYo.with(Techniques.FlipInY)
-                                .duration(400)
-                                .repeat(0)
-                                .playOn(sendMessageButton);
-                        enter[0] = false;
-                    }
+//                    if (enter[0]) {
+//                        YoYo.with(Techniques.FlipInY)
+//                                .duration(400)
+//                                .repeat(0)
+//                                .playOn(sendMessageButton);
+//                        enter[0] = false;
+//                    }
                     recordButton.setVisibility(View.GONE);
                     sendMessageButton.setVisibility(View.VISIBLE);
                 } else if (messageInput.getText().toString().length() == 0) {
-                    YoYo.with(Techniques.FlipInX)
-                            .duration(400)
-                            .repeat(0)
-                            .playOn(recordButton);
+//                    YoYo.with(Techniques.FlipInX)
+//                            .duration(400)
+//                            .repeat(0)
+//                            .playOn(recordButton);
                     recordButton.setVisibility(View.VISIBLE);
                     sendMessageButton.setVisibility(View.GONE);
-                    enter[0] = true;
+//                    enter[0] = true;
                 }
             }
 
