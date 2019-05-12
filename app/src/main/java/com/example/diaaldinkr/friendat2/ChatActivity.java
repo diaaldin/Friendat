@@ -17,6 +17,7 @@ package com.example.diaaldinkr.friendat2;
 Imports
 */
 import android.Manifest;
+import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -29,6 +30,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -95,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
-    private ImageButton attach ,sendVideo;
+    private FloatingActionButton attach ,sendVideo ,add;
     private  Uri resultUri;
     private boolean pick = false;
     private MediaRecorder mediaRecorder;
@@ -104,6 +107,7 @@ public class ChatActivity extends AppCompatActivity {
     final int PICK_VIDEO_CODE = 94;
     private MediaPlayer mediaPlayer;
     private boolean stopped =true;
+    private boolean isFABOpen=false ;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -125,6 +129,18 @@ public class ChatActivity extends AppCompatActivity {
         usersImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Images Messages");
         usersAudiosMessagesRef = FirebaseStorage.getInstance().getReference().child("Audio Messages");
         usersVideosMessagesRef = FirebaseStorage.getInstance().getReference().child("Video Messages");
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isFABOpen){
+                    showFABMenu();
+                    isFABOpen=true;
+                }else{
+                    closeFABMenu();
+                    isFABOpen=false;
+                }
+            }
+        });
 
         /*
         Click listener for the send message button
@@ -262,12 +278,62 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+    private void showFABMenu(){
+
+          add.animate().rotationBy(180).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {}
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                if (add.getRotation() != 180) {
+                    add.setRotation(180);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {}
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {}
+        });
+        attach.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
+        sendVideo.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+    }
+
+    private void closeFABMenu() {
+        add.animate().rotationBy(-180);
+        attach.animate().translationY(0);
+        sendVideo.animate().translationY(0).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                if (add.getRotation() != -180) {
+                    add.setRotation(-180);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+    }
 
     private void sendVideo() {
         startActivityForResult(Intent.createChooser(new Intent().
                 setAction(Intent.ACTION_GET_CONTENT).
                 setType("video/mp4"),
-                "selecton video"),
+                "select video"),
                 PICK_VIDEO_CODE);
     }
 
@@ -579,10 +645,10 @@ public class ChatActivity extends AppCompatActivity {
         userName = findViewById(R.id.custom_profile_name);
         lastSeen = findViewById(R.id.custom_last_seen);
         attach = findViewById(R.id.attach_button);
+        add = findViewById(R.id.add);
         sendVideo = findViewById(R.id.pick_video_button);
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
-
         recordButton =  findViewById(R.id.record_button);
 
         userMessagesList = findViewById(R.id.private_messages_list);

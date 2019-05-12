@@ -55,21 +55,36 @@
                 android:textColorHint="@android:color/white"
                 />
 
-            <ImageButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/attach_button"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                app:srcCompat="@drawable/attach_file" />
-            <ImageButton
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_pic_image"
+                app:fabCustomSize="40dp"
+                android:backgroundTint="@color/colorPrimaryDark"/>
+
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/pick_video_button"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                app:srcCompat="@drawable/ic_video"
-                tools:ignore="VectorDrawableCompat" />
+                android:src="@drawable/ic_pic_video"
+                app:fabCustomSize="40dp"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="@color/colorPrimaryDark"
+                />
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/fab_add"
+                app:fabCustomSize="40dp"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="@color/colorPrimaryDark"
+                />
+
         </LinearLayout>
 
         <Button
