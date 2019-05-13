@@ -98,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
-    private FloatingActionButton attach ,sendVideo ,add;
+    private FloatingActionButton sendImage ,sendVideo ,add;
     private  Uri resultUri;
     private boolean pick = false;
     private MediaRecorder mediaRecorder;
@@ -141,7 +141,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
-
+        add.performClick();
         /*
         Click listener for the send message button
         */
@@ -271,7 +271,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        attach.setOnClickListener(new View.OnClickListener() {
+        sendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkAndroidVersion();
@@ -297,13 +297,13 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onAnimationRepeat(Animator animator) {}
         });
-        attach.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
+        sendImage.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
         sendVideo.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
     }
 
     private void closeFABMenu() {
         add.animate().rotationBy(-180);
-        attach.animate().translationY(0);
+        sendImage.animate().translationY(0);
         sendVideo.animate().translationY(0).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -361,8 +361,7 @@ public class ChatActivity extends AppCompatActivity {
                     SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
                     saveCurrentTime = currentTime.format(calendar.getTime());
                     Map messageTextBody = new HashMap();
-                    /**************************************************************************************/
-                    /**************************************************************************************/
+
                     messageTextBody.put("message", downloadUri);
                     //this is the message type and the text for just text messages i had to add another types
                     messageTextBody.put("type", "audio");
@@ -644,9 +643,11 @@ public class ChatActivity extends AppCompatActivity {
         userImage = findViewById(R.id.custom_profile_image);
         userName = findViewById(R.id.custom_profile_name);
         lastSeen = findViewById(R.id.custom_last_seen);
-        attach = findViewById(R.id.attach_button);
         add = findViewById(R.id.add);
+        sendImage = findViewById(R.id.pick_image_button);
         sendVideo = findViewById(R.id.pick_video_button);
+        sendImage.animate().translationYBy(0).start();
+        sendVideo.animate().translationXBy(0).start();
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
         recordButton =  findViewById(R.id.record_button);
