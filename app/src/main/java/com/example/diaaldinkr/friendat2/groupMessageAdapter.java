@@ -1,10 +1,13 @@
 package com.example.diaaldinkr.friendat2;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,11 +27,12 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
     private FirebaseAuth mAuth;
     private DatabaseReference userRef, groupRef;
     private String groupID;
+    private Context context;
 
-    public groupMessageAdapter(List<groupMessages> groupMessagesList, String groupID){
+    public groupMessageAdapter(List<groupMessages> groupMessagesList, String groupID, Context context){
         this.groupMessagesList = groupMessagesList;
         this.groupID = groupID;
-
+        this.context=context;
     }
 
     @NonNull
@@ -45,8 +49,8 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
     public void onBindViewHolder(@NonNull final groupMessageViewHolder groupMessageViewHolder, int i) {
         //retrieve and display the messages
         String messageSenderID = mAuth.getCurrentUser().getUid();
-        groupMessages groupMessages = groupMessagesList.get(i);
-        String fromUserID = groupMessages.getSender_id();
+        final groupMessages groupMessages = groupMessagesList.get(i);
+        final String fromUserID = groupMessages.getSender_id();
         String fromUserName = groupMessages.getName();
         String fromMessageType = groupMessages.getType();
         String messageTime = groupMessages.getTime();
@@ -82,6 +86,50 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                 groupMessageViewHolder.senderMessageName.setText(groupMessages.getName());
                 groupMessageViewHolder.receiverMessageTime.setText(groupMessages.getTime());
             }
+        } else if(fromMessageType.equals("image")){
+            groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
+            groupMessageViewHolder.senderMessageText.setVisibility(View.GONE);
+            if(fromUserID.equals(messageSenderID)){
+                groupMessageViewHolder.receiverImageGroupMessages.setVisibility(View.GONE);
+                groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
+
+                groupMessageViewHolder.senderImageGroupMessages.setVisibility(View.VISIBLE);
+                groupMessageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+
+                groupMessageViewHolder.senderImageGroupMessages.setBackgroundResource(R.drawable.sender_messages_layout);
+                Picasso.get().load(groupMessages.getMessage()).placeholder(R.drawable.profile_image).into(groupMessageViewHolder.senderImageGroupMessages);
+                groupMessageViewHolder.senderMessageTime.setText(groupMessages.getTime());
+                groupMessageViewHolder.senderImageGroupMessages.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent imageViewerIntent = new Intent(context.getApplicationContext(),ImageViewerActivity.class);
+                        imageViewerIntent.putExtra("image",groupMessages.getMessage());
+                        imageViewerIntent.putExtra("sender_id",fromUserID);
+                        imageViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(imageViewerIntent);
+                    }
+                });
+            } else {
+                groupMessageViewHolder.senderImageGroupMessages.setVisibility(View.GONE);
+                groupMessageViewHolder.senderMessageTime.setVisibility(View.GONE);
+
+                groupMessageViewHolder.receiverImageGroupMessages.setVisibility(View.VISIBLE);
+                groupMessageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+
+                groupMessageViewHolder.receiverImageGroupMessages.setBackgroundResource(R.drawable.receiver_messages_layout);
+                Picasso.get().load(groupMessages.getMessage()).placeholder(R.drawable.profile_image).into(groupMessageViewHolder.receiverImageGroupMessages);
+                groupMessageViewHolder.receiverMessageTime.setText(groupMessages.getTime());
+                groupMessageViewHolder.receiverImageGroupMessages.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent imageViewerIntent = new Intent(context.getApplicationContext(), ImageViewerActivity.class);
+                        imageViewerIntent.putExtra("image", groupMessages.getMessage());
+                        imageViewerIntent.putExtra("sender_id", fromUserID);
+                        imageViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(imageViewerIntent);
+                    }
+                });
+            }
         }
 
     }
@@ -93,22 +141,27 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
 
     public class  groupMessageViewHolder extends RecyclerView.ViewHolder{
         public TextView senderMessageText, receiverMessageText ,receiverMessageTime ,senderMessageTime ,senderMessageName ;
+        public ImageButton receiverImageGroupMessages, senderImageGroupMessages;
         public groupMessageViewHolder(@NonNull View itemView) {
             super(itemView);
 
             senderMessageText = itemView.findViewById(R.id.sender_group_message_text);
             senderMessageName = itemView.findViewById(R.id.sender_group_message_name);
             senderMessageTime = itemView.findViewById(R.id.sender_group_message_time);
+            senderImageGroupMessages = itemView.findViewById(R.id.sender_image_group_messages);
 
             receiverMessageText = itemView.findViewById(R.id.receiver_group_message_text);
             receiverMessageTime = itemView.findViewById(R.id.receiver_group_message_time);
+            receiverImageGroupMessages = itemView.findViewById(R.id.receiver_image_group_messages);
 
             senderMessageText.setVisibility(View.GONE);
             senderMessageName.setVisibility(View.GONE);
             senderMessageTime.setVisibility(View.GONE);
+            senderImageGroupMessages.setVisibility(View.GONE);
 
             receiverMessageText.setVisibility(View.GONE);
             receiverMessageTime.setVisibility(View.GONE);
+            receiverImageGroupMessages.setVisibility(View.GONE);
         }
     }
 }

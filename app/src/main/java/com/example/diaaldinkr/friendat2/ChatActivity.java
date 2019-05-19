@@ -646,8 +646,6 @@ public class ChatActivity extends AppCompatActivity {
         add = findViewById(R.id.add);
         sendImage = findViewById(R.id.pick_image_button);
         sendVideo = findViewById(R.id.pick_video_button);
-        sendImage.animate().translationYBy(0).start();
-        sendVideo.animate().translationXBy(0).start();
         messageInput = findViewById(R.id.input_message);
         sendMessageButton = findViewById(R.id.send_message_btn);
         recordButton =  findViewById(R.id.record_button);

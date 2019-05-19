@@ -75,7 +75,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private TextView displayTextMessage;
     private FirebaseAuth mAuth;
     private FloatingActionButton sendImage ,sendVideo ,add;
-    private DatabaseReference usersRef, groupIdRef, groupMessageKeyRef;
+    private DatabaseReference usersRef, groupIdRef, groupMessageKeyRef, groupMessageKeyRef2;
     private final List<groupMessages> messagesList = new ArrayList<>();
     private String currentGroupName, currentGroupImageURI, groupID, currentUserID, currentUserName , currentDate, currentTime;
     private groupMessageAdapter groupMessageAdapter;
@@ -212,12 +212,12 @@ public class GroupChatActivity extends AppCompatActivity {
         groupIdRef.child("user_messages").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    groupMessages messages = dataSnapshot.getValue(groupMessages.class);
-                    messagesList.add(messages);
-                    groupMessageAdapter.notifyDataSetChanged();
+                groupMessages messages = dataSnapshot.getValue(groupMessages.class);
+                messagesList.add(messages);
+                groupMessageAdapter.notifyDataSetChanged();
 //                  userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
-                    groupMessagesList.setAdapter(groupMessageAdapter);
-                }
+                groupMessagesList.setAdapter(groupMessageAdapter);
+            }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
@@ -335,17 +335,14 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void checkAndroidVersion(){
         //REQUEST PERMISSION
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.d(">>>", "Im here 2");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            pickImage();
+        } else {
             try {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 555);
-                Log.d(">>>", "Im here 2.1");
             }catch (Exception e){
-                Log.d(">>>", "Im here 2.2");
+
             }
-        } else {
-            Log.d(">>>", "Im here 3");
-            pickImage();
         }
     }
 
@@ -471,7 +468,7 @@ public class GroupChatActivity extends AppCompatActivity {
         sendImage = findViewById(R.id.pick_image_button);
         sendVideo = findViewById(R.id.pick_video_button);
         add = findViewById(R.id.add);
-        groupMessageAdapter = new groupMessageAdapter(messagesList,groupID);
+        groupMessageAdapter = new groupMessageAdapter(messagesList, groupID, getApplicationContext());
         linearLayoutManager = new LinearLayoutManager(this);
         groupMessagesList.setLayoutManager(linearLayoutManager);
 
@@ -505,6 +502,16 @@ public class GroupChatActivity extends AppCompatActivity {
                 .setInitialCropWindowPaddingRatio(0)
                 .start(this);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 555 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pickImage();
+        } else {
+            checkAndroidVersion();
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -521,9 +528,12 @@ public class GroupChatActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 resultUri = result.getUri();
-                final DatabaseReference groupMessageKeyRef = FirebaseDatabase.getInstance().getReference().child("Groups").push();
+                final String messageKey  =groupIdRef.push().getKey();
+                groupMessageKeyRef2 = groupIdRef.child("user_messages").child(messageKey);
+                Log.d(">>>", "onActivityResult: "+groupMessageKeyRef2.getKey());
+                DatabaseReference groupImageMessageKeyRef = FirebaseDatabase.getInstance().getReference().child("Groups").push();
                 //this key used to store the messages
-                final String messagePushID = groupMessageKeyRef.getKey();
+                final String messagePushID = groupImageMessageKeyRef.getKey();
                 StorageReference filePath = groupsImagesMessagesRef.child(messagePushID + ".jpg");
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -531,27 +541,28 @@ public class GroupChatActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             //get the link of the profile image from the storage and store the link in the database
                             final String downloadUri = task.getResult().getDownloadUrl().toString();
+                            Calendar calendar = Calendar.getInstance();
                             SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
-                            Map messageTextBody = new HashMap();
-                            /**************************************************************************************/
-                            /**************************************************************************************/
+                            String saveCurrentTime = currentTime.format(calendar.getTime());
+                            HashMap<String,Object> messageTextBody = new HashMap<>();
                             messageTextBody.put("name",currentUserName);
                             messageTextBody.put("sender_id",currentUserID);
                             messageTextBody.put("message",downloadUri);
-                            messageTextBody.put("time",currentTime);
+                            messageTextBody.put("time",saveCurrentTime);
                             messageTextBody.put("type","image");
-
-
-                            groupIdRef.child("user_messages").updateChildren(messageTextBody).addOnCompleteListener(new OnCompleteListener() {
+                            groupMessageKeyRef2.updateChildren(messageTextBody).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
-                                public void onComplete(@NonNull Task task) {
-                                    if (task.isSuccessful()) {
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    userMessageInput.setText("");
+                                    add.performClick();
+                                    if(task.isSuccessful()){
                                         Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
-                                    } else {
+                                    }else{
                                         Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
+
                         } else {
                             String message = task.getException().toString();
                             Toast.makeText(GroupChatActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
