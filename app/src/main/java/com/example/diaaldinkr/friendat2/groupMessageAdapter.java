@@ -18,9 +18,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapter.groupMessageViewHolder> {
     private List<groupMessages> groupMessagesList;
@@ -61,7 +63,15 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
             /*messageViewHolder.receiverMessageText.setVisibility(View.GONE);
             messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
             messageViewHolder.senderMessageText.setVisibility(View.GONE);*/
-
+            String target_language=getTo();
+            //Default variables for translation
+            String textToBeTranslated = groupMessages.getMessage();
+            String TranslatedText;
+            String source_language;
+            source_language=Detect(textToBeTranslated);
+            String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
+            //Executing the translation function
+            TranslatedText=Translate(textToBeTranslated,languagePair);
             if(fromUserID.equals(messageSenderID)){
                 groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
                 groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
@@ -134,6 +144,63 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
 
     }
 
+    private String getTo() {
+        String id = mAuth.getCurrentUser().getUid();
+        userRef = FirebaseDatabase.getInstance().getReference();
+        final String[] lang = {""};
+        userRef.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                lang[0] = dataSnapshot.child("lang_code").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        return lang[0];
+    }
+
+    //Function for calling executing the Detector Background Task
+    private String Detect(String textToBeDetected){
+        DetectorBackgroundTask detectorBackgroundTask= new DetectorBackgroundTask(context);
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = detectorBackgroundTask.execute(textToBeDetected).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
+    //Function for calling executing the Translator Background Task
+    private String Translate(String textToBeTranslated,String languagePair){
+        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(context);
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = translatorBackgroundTask.execute(textToBeTranslated,languagePair).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
     @Override
     public int getItemCount() {
         return groupMessagesList.size();

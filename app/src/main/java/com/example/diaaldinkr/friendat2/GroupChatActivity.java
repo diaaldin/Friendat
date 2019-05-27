@@ -1,3 +1,11 @@
+
+/* This class is to Send text messages or audio records or pictures in groups chat
+ * Here I check the permissions for the camera and the microphone to take pictures and record audio
+ * I save all the messages in the firebase database and save the images and the records in the firebase storage
+ * and save the downloaded links in the firebase database
+ * also i save the images and the records in the device storage
+ * also checking the status of the users (online, offline or typing ) */
+
 package com.example.diaaldinkr.friendat2;
 
 import android.Manifest;

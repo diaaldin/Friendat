@@ -1,6 +1,6 @@
 
 
-/* This class is to Send text messages or audio records or pictures
+/* This class is to Send text messages or audio records or pictures in single chat
  * Here I check the permissions for the camera and the microphone to take pictures and record audio
  * I save all the messages in the firebase database and save the images and the records in the firebase storage
  * and save the downloaded links in the firebase database
