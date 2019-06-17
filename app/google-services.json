@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:482653876299:android:f38fbdf03d2e32cf",
         "android_client_info": {
-          "package_name": "com.example.diaaldinkr.friendat2"
+          "package_name": "com.abuTawfeek.diaaldinkr.friendat2"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "482653876299-jiftv38l8rnvit5mj8frpnp73hefnvdh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.diaaldinkr.friendat2",
+            "package_name": "com.abuTawfeek.diaaldinkr.friendat2",
             "certificate_hash": "1d067c9230c97a22f8cebeef08a5d848c774effd"
           }
         },
