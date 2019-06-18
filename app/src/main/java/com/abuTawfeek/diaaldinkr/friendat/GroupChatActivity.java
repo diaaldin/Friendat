@@ -63,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -85,8 +86,10 @@ public class GroupChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MediaRecorder mediaRecorder;
     private StorageReference groupsImagesMessagesRef;
+    private StorageReference groupsVideoMessagesRef;
     private String pathSave;
     final int REQUEST_PERMISSION_CODE = 1000;
+    final int PICK_VIDEO_CODE = 94;
     private boolean isFABOpen = false ;
     private boolean stopped = true ;
     private  Uri resultUri;
@@ -107,6 +110,7 @@ public class GroupChatActivity extends AppCompatActivity {
         usersRef= FirebaseDatabase.getInstance().getReference().child("Users");
         groupIdRef=FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
         groupsImagesMessagesRef = FirebaseStorage.getInstance().getReference().child("Groups Images Messages");
+        groupsVideoMessagesRef = FirebaseStorage.getInstance().getReference().child("Groups Video Messages");
         usersAudiosMessagesRef = FirebaseStorage.getInstance().getReference().child("Groups Audio Messages");
         InitializeFields();
 
@@ -204,6 +208,12 @@ public class GroupChatActivity extends AppCompatActivity {
                 return true;
             }
         });
+        sendVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendVideo();
+            }
+        });
         sendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -241,6 +251,15 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void sendVideo() {
+        startActivityForResult(Intent.createChooser(new Intent().
+                        setAction(Intent.ACTION_GET_CONTENT).
+                        setType("video/mp4"),
+                "select video"),
+                PICK_VIDEO_CODE);
+    }
+
     private void showFABMenu(){
 
         add.animate().rotationBy(180).setListener(new Animator.AnimatorListener() {
@@ -324,16 +343,16 @@ public class GroupChatActivity extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance();
                     SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
                     saveCurrentTime = currentTime.format(calendar.getTime());
-                    HashMap messageTextBody = new HashMap<>();
-
-                    messageTextBody.put("message", downloadUri);
-                    //this is the message type and the text for just text messages i had to add another types
-                    messageTextBody.put("type", "audio");
-                    messageTextBody.put("from", currentUserID);
-                    messageTextBody.put("time", saveCurrentTime);
-                    userMessageKeyRef.updateChildren(messageTextBody).addOnCompleteListener(new OnCompleteListener() {
+                    HashMap<String,Object> messageTextBody = new HashMap<>();
+                    messageTextBody.put("name",currentUserName);
+                    messageTextBody.put("sender_id",currentUserID);
+                    messageTextBody.put("message",downloadUri);
+                    messageTextBody.put("time",saveCurrentTime);
+                    messageTextBody.put("type","audio");
+                    userMessageKeyRef.updateChildren(messageTextBody).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onComplete(@NonNull Task task) {
+                        public void onComplete(@NonNull Task<Void> task) {
+                            userMessageInput.setText("");
                             if(task.isSuccessful()){
                                 Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
                             }else{
@@ -341,7 +360,6 @@ public class GroupChatActivity extends AppCompatActivity {
                             }
                         }
                     });
-
                 } else {
                     String message = task.getException().toString();
                     Toast.makeText(GroupChatActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
@@ -384,7 +402,7 @@ public class GroupChatActivity extends AppCompatActivity {
             try {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 555);
             }catch (Exception e){
-
+                e.printStackTrace();
             }
         }
     }
@@ -608,6 +626,51 @@ public class GroupChatActivity extends AppCompatActivity {
                     }
                 });
             }
+        }
+        if( requestCode == PICK_VIDEO_CODE && resultCode == Activity.RESULT_OK) {
+            resultUri = data.getData();
+
+
+            final String messageKey = groupIdRef.push().getKey();
+            groupMessageKeyRef2 = groupIdRef.child("user_messages").child(messageKey);
+            DatabaseReference groupVideoMessageKeyRef = FirebaseDatabase.getInstance().getReference().child("Groups").push();
+            //this key used to store the messages
+            final String messagePushID = groupVideoMessageKeyRef.getKey();
+            StorageReference filePath = groupsVideoMessagesRef.child(messagePushID + ".mp4");
+            filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        //get the link of the profile image from the storage and store the link in the database
+                        final String downloadUri = task.getResult().getDownloadUrl().toString();
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+                        String saveCurrentTime = currentTime.format(calendar.getTime());
+                        HashMap<String, Object> messageTextBody = new HashMap<>();
+                        messageTextBody.put("name", currentUserName);
+                        messageTextBody.put("sender_id", currentUserID);
+                        messageTextBody.put("message", downloadUri);
+                        messageTextBody.put("time", saveCurrentTime);
+                        messageTextBody.put("type", "video");
+                        groupMessageKeyRef2.updateChildren(messageTextBody).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                userMessageInput.setText("");
+                                add.performClick();
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+                    } else {
+                        String message = task.getException().toString();
+                        Toast.makeText(GroupChatActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 }

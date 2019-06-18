@@ -304,7 +304,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }else if(fromMessageType.equals("video")){
 
             messageViewHolder.receiverMessageText.setVisibility(View.GONE);
-            messageViewHolder.receiverVedioMessage.setVisibility(View.GONE);
+            messageViewHolder.receiverVideoMessage.setVisibility(View.GONE);
             messageViewHolder.receiverImageMessages.setVisibility(View.GONE);
             messageViewHolder.receiverTranslatedMessageText.setVisibility(View.GONE);
             messageViewHolder.receiverPlayRecord.setVisibility(View.GONE);
@@ -314,31 +314,31 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageViewHolder.senderTranslatedMessageText.setVisibility(View.GONE);
             messageViewHolder.senderPlayRecord.setVisibility(View.GONE);
             messageViewHolder.senderTimeRecord.setVisibility(View.GONE);
-            messageViewHolder.senderVedioMessage.setVisibility(View.GONE);
+            messageViewHolder.senderVideoMessage.setVisibility(View.GONE);
             messageViewHolder.senderImageMessages.setVisibility(View.GONE);
 
             if(fromUserID.equals(messageSenderID)){
                 messageViewHolder.receiverMessageTime.setVisibility(View.GONE);
-                messageViewHolder.receiverVedioMessage.setVisibility(View.GONE);
+                messageViewHolder.receiverVideoMessage.setVisibility(View.GONE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
                 messageViewHolder.playVideo.setVisibility(View.GONE);
                 messageViewHolder.frameLayout.setVisibility(View.GONE);
 
                 messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
-                messageViewHolder.senderVedioMessage.setVisibility(View.VISIBLE);
+                messageViewHolder.senderVideoMessage.setVisibility(View.VISIBLE);
                 messageViewHolder.playVideo2.setVisibility(View.VISIBLE);
                 messageViewHolder.frameLayout2.setVisibility(View.VISIBLE);
 
                 //messageViewHolder.senderVideoMessage.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
                 Uri myUri = Uri.parse(messages.getMessage()); // initialize Uri here
-                messageViewHolder.senderVedioMessage.setVideoURI(myUri);
-                messageViewHolder.senderVedioMessage.seekTo( 1 );
+                messageViewHolder.senderVideoMessage.setVideoURI(myUri);
+                messageViewHolder.senderVideoMessage.seekTo( 1 );
                 final Intent videoViewerIntent = new Intent(context.getApplicationContext(),VideoViewer.class);
                 videoViewerIntent.putExtra("video",messages.getMessage());
                 videoViewerIntent.putExtra("sender_id",fromUserID);
                 videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                messageViewHolder.senderVedioMessage.setOnClickListener(new View.OnClickListener() {
+                messageViewHolder.senderVideoMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         context.startActivity(videoViewerIntent);
@@ -352,12 +352,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 });
             } else{
                 messageViewHolder.senderMessageTime.setVisibility(View.GONE);
-                messageViewHolder.senderVedioMessage.setVisibility(View.GONE);
+                messageViewHolder.senderVideoMessage.setVisibility(View.GONE);
                 messageViewHolder.playVideo2.setVisibility(View.GONE);
                 messageViewHolder.frameLayout2.setVisibility(View.GONE);
 
                 messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
-                messageViewHolder.receiverVedioMessage.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverVideoMessage.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.playVideo.setVisibility(View.VISIBLE);
                 messageViewHolder.frameLayout.setVisibility(View.VISIBLE);
@@ -366,13 +366,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
                 Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverImageMessages);
                 Uri myUri = Uri.parse(messages.getMessage()); // initialize Uri here
-                messageViewHolder.receiverVedioMessage.setVideoURI(myUri);
-                messageViewHolder.receiverVedioMessage.seekTo( 1 );
+                messageViewHolder.receiverVideoMessage.setVideoURI(myUri);
+                messageViewHolder.receiverVideoMessage.seekTo( 1 );
                 final Intent videoViewerIntent = new Intent(context.getApplicationContext(),VideoViewer.class);
                 videoViewerIntent.putExtra("video",messages.getMessage());
                 videoViewerIntent.putExtra("sender_id",fromUserID);
-                videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                messageViewHolder.receiverVedioMessage.setOnClickListener(new View.OnClickListener() {
+                videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                messageViewHolder.receiverVideoMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         context.startActivity(videoViewerIntent);
@@ -385,12 +385,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     }
                 });
             }
-
-
-
         }
-
     }
+
     public  String milliSecondsToTimer(long milliseconds) {
         String finalTimerString = "";
         String secondsString = "";
@@ -460,7 +457,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 , receiverTranslatedMessageText, senderTimeRecord, receiverTimeRecord;
         public ImageButton receiverImageMessages, senderImageMessages, playVideo, playVideo2;
         public ImageView senderPlayRecord, receiverPlayRecord;
-        public VideoView senderVedioMessage, receiverVedioMessage;
+        public VideoView senderVideoMessage, receiverVideoMessage;
         public CircleImageView receiverProfileImage;
         public FrameLayout frameLayout, frameLayout2;
         public MessageViewHolder(@NonNull View itemView) {
@@ -472,7 +469,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             senderImageMessages = itemView.findViewById(R.id.sender_image_messages);
             senderPlayRecord = itemView.findViewById(R.id.sender_play_record);
             senderTimeRecord = itemView.findViewById(R.id.sender_record_time);
-            senderVedioMessage = itemView.findViewById(R.id.sender_video_layout);
+            senderVideoMessage = itemView.findViewById(R.id.sender_video_layout);
             playVideo = itemView.findViewById(R.id.play_video);
             frameLayout = itemView.findViewById(R.id.video_frame);
 
@@ -484,7 +481,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             receiverImageMessages = itemView.findViewById(R.id.receiver_image_messages);
             receiverPlayRecord = itemView.findViewById(R.id.receiver_play_record);
             receiverTimeRecord = itemView.findViewById(R.id.receiver_record_time);
-            receiverVedioMessage = itemView.findViewById(R.id.receiver_video_layout);
+            receiverVideoMessage = itemView.findViewById(R.id.receiver_video_layout);
             playVideo2 = itemView.findViewById(R.id.play_video2);
             frameLayout2 = itemView.findViewById(R.id.video_frame2);
 
@@ -493,7 +490,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             senderImageMessages.setVisibility(View.GONE);
             senderPlayRecord.setVisibility(View.GONE);
             senderTimeRecord.setVisibility(View.GONE);
-            senderVedioMessage.setVisibility(View.GONE);
+            senderVideoMessage.setVisibility(View.GONE);
             playVideo.setVisibility(View.GONE);
             frameLayout.setVisibility(View.GONE);
 
@@ -503,7 +500,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             receiverImageMessages.setVisibility(View.GONE);
             receiverPlayRecord.setVisibility(View.GONE);
             receiverTimeRecord.setVisibility(View.GONE);
-            receiverVedioMessage.setVisibility(View.GONE);
+            receiverVideoMessage.setVisibility(View.GONE);
             playVideo2.setVisibility(View.GONE);
             frameLayout2.setVisibility(View.GONE);
 
