@@ -17,7 +17,7 @@ Please visit our [wiki](../../wiki) for furthur project information
 ### [BackEnd Missions Board](https://github.com/diaaldin/Friendat/projects/1)
 ### [My Diary](https://github.com/diaaldin/Friendat/wiki/Diary)
 ### [XML code](https://github.com/diaaldin/Friendat/tree/master/app/src/main/res/layout)
-### [Java code](https://github.com/diaaldin/Friendat/tree/master/app/src/main/java/com/example/diaaldinkr/friendat2)
+### [Java code](https://github.com/diaaldin/Friendat/tree/master/app/src/main/java/com/abuTawfeek/diaaldinkr/friendat)
 *___________________________________________________________________________________________________________________________________*
 ### [Version Alpha Video](https://www.youtube.com/watch?v=yzrq8KL_BHo)
 
