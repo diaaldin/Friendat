@@ -36,7 +36,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
     private Context context;
-    private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
     private int position = 0;
     public MessageAdapter(List<Messages> userMessagesList ,Context context){
@@ -185,6 +184,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 });
             }
         }else if(fromMessageType.equals("audio")){
+            final MediaPlayer mediaPlayer = new MediaPlayer();
+            Uri myUri = Uri.parse(messages.getMessage()); // initialize Uri here
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            try {
+                mediaPlayer.setDataSource(context, myUri);
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             messageViewHolder.receiverMessageText.setVisibility(View.GONE);
             messageViewHolder.receiverTranslatedMessageText.setVisibility(View.GONE);
             messageViewHolder.senderMessageText.setVisibility(View.GONE);
@@ -204,15 +212,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 messageViewHolder.senderPlayRecord.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
-                mediaPlayer = new MediaPlayer();
-                final Uri myUri = Uri.parse(messages.getMessage()); // initialize Uri here
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                try {
-                    mediaPlayer.setDataSource(context, myUri);
-                    mediaPlayer.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 messageViewHolder.senderTimeRecord.setText(milliSecondsToTimer(mediaPlayer.getDuration()));
                 messageViewHolder.senderPlayRecord.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -220,20 +219,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         if (isPlaying){
                             messageViewHolder.senderPlayRecord.setImageResource(R.drawable.ic_play);
                             mediaPlayer.pause();
-                            if(position==mediaPlayer.getDuration()){
-                                position=0;
-                                messageViewHolder.senderPlayRecord.setImageResource(R.drawable.ic_play);
-                            }
-                            position=mediaPlayer.getCurrentPosition();
-                            mediaPlayer.reset();
                         }else{
                             messageViewHolder.senderPlayRecord.setImageResource(R.drawable.ic_pause_record);
-                            if(position>=mediaPlayer.getDuration()){
-                                position=0;
-                                messageViewHolder.senderPlayRecord.setImageResource(R.drawable.ic_play);
-                            }
-//                            messageViewHolder.senderPauseRecord.setVisibility(View.GONE);
-                            mediaPlayer.seekTo(position);
                             mediaPlayer.start();
                         }
                         isPlaying =!isPlaying;
@@ -245,6 +232,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     public void onCompletion(MediaPlayer mp) {
                         mp.seekTo(0);
                         messageViewHolder.senderPlayRecord.setImageResource(R.drawable.ic_play);
+                        isPlaying =!isPlaying;
                     }
                 });
             }else{
@@ -259,15 +247,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 messageViewHolder.receiverPlayRecord.setBackgroundResource(R.drawable.receiver_messages_layout);
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
-                mediaPlayer = new MediaPlayer();
-                final Uri myUri = Uri.parse(messages.getMessage()); // initialize Uri here
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                try {
-                    mediaPlayer.setDataSource(context, myUri);
-                    mediaPlayer.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 messageViewHolder.receiverTimeRecord.setText(milliSecondsToTimer(mediaPlayer.getDuration()));
                 messageViewHolder.receiverPlayRecord.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -275,19 +254,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         if (isPlaying){
                             messageViewHolder.receiverPlayRecord.setImageResource(R.drawable.ic_play);
                             mediaPlayer.pause();
-                            if(position==mediaPlayer.getDuration()){
-                                position=0;
-                                messageViewHolder.receiverPlayRecord.setImageResource(R.drawable.ic_play);
-                            }
-                            position=mediaPlayer.getCurrentPosition();
-                            mediaPlayer.reset();
                         }else{
                             messageViewHolder.receiverPlayRecord.setImageResource(R.drawable.ic_pause_record);
-                            if(position>=mediaPlayer.getDuration()){
-                                position=0;
-                                messageViewHolder.receiverPlayRecord.setImageResource(R.drawable.ic_play);
-                            }
-                            mediaPlayer.seekTo(position);
                             mediaPlayer.start();
                         }
                         isPlaying =!isPlaying;
@@ -299,6 +267,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     public void onCompletion(MediaPlayer mp) {
                         mp.seekTo(0);
                         messageViewHolder.receiverPlayRecord.setImageResource(R.drawable.ic_play);
+                        isPlaying =!isPlaying;
                     }
                 });
             }
