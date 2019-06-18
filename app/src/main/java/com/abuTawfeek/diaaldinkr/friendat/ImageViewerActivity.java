@@ -9,6 +9,7 @@ package com.abuTawfeek.diaaldinkr.friendat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ImageView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,6 +44,12 @@ public class ImageViewerActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
             }
         });
 

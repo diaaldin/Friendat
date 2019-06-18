@@ -41,6 +41,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -118,6 +119,8 @@ public class ChatActivity extends AppCompatActivity {
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = getIntent().getExtras().get("visit_user_image").toString();
         messageReceiverLangCode = getIntent().getExtras().get("visit_user_lang_code").toString();
+
+
 
         initializeControllers();
         userName.setText(messageReceiverName);
@@ -284,7 +287,7 @@ public class ChatActivity extends AppCompatActivity {
     }
     private void showFABMenu(){
 
-          add.animate().rotationBy(180).setListener(new Animator.AnimatorListener() {
+        add.animate().rotationBy(180).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {}
 
@@ -335,8 +338,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendVideo() {
         startActivityForResult(Intent.createChooser(new Intent().
-                setAction(Intent.ACTION_GET_CONTENT).
-                setType("video/mp4"),
+                        setAction(Intent.ACTION_GET_CONTENT).
+                        setType("video/mp4"),
                 "select video"),
                 PICK_VIDEO_CODE);
     }

@@ -17,8 +17,9 @@
         android:supportsRtl="true"
         android:debuggable="false"
         android:theme="@style/AppTheme"
-        tools:ignore="HardcodedDebugMode">
-        <activity android:name="com.abuTawfeek.diaaldinkr.friendat.VideoViewer"></activity>
+        tools:ignore="GoogleAppIndexingWarning,HardcodedDebugMode">
+        <activity android:name="com.abuTawfeek.diaaldinkr.friendat.VideoViewer"
+            android:launchMode="singleTop"/>
         <activity android:name="com.abuTawfeek.diaaldinkr.friendat.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +50,8 @@
         <activity
             android:name="com.abuTawfeek.diaaldinkr.friendat.CreateGroupActivity"
             android:parentActivityName="com.abuTawfeek.diaaldinkr.friendat.MainActivity" />
-        <activity android:name="com.abuTawfeek.diaaldinkr.friendat.ImageViewerActivity" />
+        <activity android:name="com.abuTawfeek.diaaldinkr.friendat.ImageViewerActivity"
+            android:launchMode="singleTop"/>
     </application>
 
 </manifest>

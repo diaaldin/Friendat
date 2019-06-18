@@ -371,7 +371,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 final Intent videoViewerIntent = new Intent(context.getApplicationContext(),VideoViewer.class);
                 videoViewerIntent.putExtra("video",messages.getMessage());
                 videoViewerIntent.putExtra("sender_id",fromUserID);
-                videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 messageViewHolder.receiverVedioMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

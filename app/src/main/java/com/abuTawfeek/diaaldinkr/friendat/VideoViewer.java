@@ -1,9 +1,11 @@
 package com.abuTawfeek.diaaldinkr.friendat;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.VideoView;
@@ -61,6 +63,19 @@ public class VideoViewer extends AppCompatActivity {
                     video.pause();
                     playVideo.setVisibility(View.VISIBLE);
                 }
+            }
+        });
+        video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                video.seekTo( 1 );
+                playVideo.setVisibility(View.VISIBLE);
+            }
+        });
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
             }
         });
     }
