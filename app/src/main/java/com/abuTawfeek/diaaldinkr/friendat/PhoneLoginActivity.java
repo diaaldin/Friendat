@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -18,19 +17,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-
 import java.util.concurrent.TimeUnit;
 
 public class PhoneLoginActivity extends AppCompatActivity
 {
     private EditText InputUserPhoneNumber, InputUserVerificationCode;
     private Button SendVerificationCodeButton, VerifyButton;
-
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     private FirebaseAuth mAuth;
-
     private ProgressDialog loadingBar;
-
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
 
@@ -42,14 +37,11 @@ public class PhoneLoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_login);
 
-
         mAuth = FirebaseAuth.getInstance();
-
-
-        InputUserPhoneNumber = (EditText) findViewById(R.id.phone_number_input);
-        InputUserVerificationCode = (EditText) findViewById(R.id.verification_code_input);
-        SendVerificationCodeButton = (Button) findViewById(R.id.send_ver_code_button);
-        VerifyButton = (Button) findViewById(R.id.verification_button);
+        InputUserPhoneNumber =  findViewById(R.id.phone_number_input);
+        InputUserVerificationCode = findViewById(R.id.verification_code_input);
+        SendVerificationCodeButton = findViewById(R.id.send_ver_code_button);
+        VerifyButton = findViewById(R.id.verification_button);
         loadingBar = new ProgressDialog(this);
 
 
@@ -126,7 +118,7 @@ public class PhoneLoginActivity extends AppCompatActivity
                 loadingBar.dismiss();
 
                 InputUserPhoneNumber.setVisibility(View.VISIBLE);
-                SendVerificationCodeButton.setVisibility(View.GONE);
+                SendVerificationCodeButton.setVisibility(View.VISIBLE);
 
                 InputUserVerificationCode.setVisibility(View.GONE);
                 VerifyButton.setVisibility(View.GONE);

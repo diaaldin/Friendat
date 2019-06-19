@@ -26,8 +26,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -87,7 +91,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageViewHolder.senderPlayRecord.setVisibility(View.GONE);
             messageViewHolder.senderTimeRecord.setVisibility(View.GONE);
 
-            /*String target_language=messages.getTo();
+            String target_language=messages.getTo();
             //Default variables for translation
             String textToBeTranslated = messages.getMessage();
             String TranslatedText;
@@ -95,7 +99,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             source_language=Detect(textToBeTranslated);
             String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
             //Executing the translation function
-            TranslatedText=Translate(textToBeTranslated,languagePair);**/
+            TranslatedText=Translate(textToBeTranslated,languagePair);
 
             if(fromUserID.equals(messageSenderID)){
                 messageViewHolder.receiverMessageText.setVisibility(View.GONE);
@@ -104,13 +108,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
 
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
-                //  messageViewHolder.senderTranslatedMessageText.setVisibility(View.VISIBLE);
+                messageViewHolder.senderTranslatedMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
 
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-                //    messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
+                messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
                 messageViewHolder.senderMessageText.setText(messages.getMessage());
-                //messageViewHolder.senderTranslatedMessageText.setText(TranslatedText);
+                messageViewHolder.senderTranslatedMessageText.setText(TranslatedText);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
             }
             else{
@@ -119,16 +123,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.senderMessageTime.setVisibility(View.GONE);
 
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
-                // messageViewHolder.receiverTranslatedMessageText.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverTranslatedMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
 
                 messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                //messageViewHolder.receiverTranslatedMessageText.setBackgroundResource(R.drawable.receiver_translated_message_layout);
+                messageViewHolder.receiverTranslatedMessageText.setBackgroundResource(R.drawable.receiver_translated_message_layout);
                 /**********************>  change the to translate        */
                 messageViewHolder.receiverMessageText.setText(messages.getMessage());
-                //messageViewHolder.receiverMessageText.setText(TranslatedText);
-                // messageViewHolder.receiverTranslatedMessageText.setText(messages.getMessage());
+                messageViewHolder.receiverMessageText.setText(TranslatedText);
+                messageViewHolder.receiverTranslatedMessageText.setText(messages.getMessage());
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
             }
         }else if(fromMessageType.equals("image")){
@@ -409,44 +413,44 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         // return timer string
         return finalTimerString;
     }
-    //    //Function for calling executing the Detector Background Task
-//    private String Detect(String textToBeDetected){
-//        DetectorBackgroundTask detectorBackgroundTask= new DetectorBackgroundTask(context);
-//        String translationResult = null; // Returns the translated text as a String
-//        try {
-//            translationResult = detectorBackgroundTask.execute(textToBeDetected).get();
-//            try {
-//                final JSONObject translationResultObj = new JSONObject(translationResult);
-//                translationResult=translationResultObj.get("text").toString();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        return translationResult;
-//    }
-//    //Function for calling executing the Translator Background Task
-//    private String Translate(String textToBeTranslated,String languagePair){
-//        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(context);
-//        String translationResult = null; // Returns the translated text as a String
-//        try {
-//            translationResult = translatorBackgroundTask.execute(textToBeTranslated,languagePair).get();
-//            try {
-//                final JSONObject translationResultObj = new JSONObject(translationResult);
-//                translationResult=translationResultObj.get("text").toString();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        return translationResult;
-//    }
+        //Function for calling executing the Detector Background Task
+    private String Detect(String textToBeDetected){
+        DetectorBackgroundTask detectorBackgroundTask= new DetectorBackgroundTask(context);
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = detectorBackgroundTask.execute(textToBeDetected).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
+    //Function for calling executing the Translator Background Task
+    private String Translate(String textToBeTranslated,String languagePair){
+        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(context);
+        String translationResult = null; // Returns the translated text as a String
+        try {
+            translationResult = translatorBackgroundTask.execute(textToBeTranslated,languagePair).get();
+            try {
+                final JSONObject translationResultObj = new JSONObject(translationResult);
+                translationResult=translationResultObj.get("text").toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return translationResult;
+    }
     @Override
     public int getItemCount() {
         return userMessagesList.size();
