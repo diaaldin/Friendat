@@ -60,7 +60,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
     @Override
     public void onBindViewHolder(@NonNull final groupMessageViewHolder groupMessageViewHolder, int i) {
         //retrieve and display the messages
-        String messageSenderID = mAuth.getCurrentUser().getUid();
+        final String messageSenderID = mAuth.getCurrentUser().getUid();
         final groupMessages groupMessages = groupMessagesList.get(i);
         final String fromUserID = groupMessages.getSender_id();
         String fromUserName = groupMessages.getName();
@@ -70,19 +70,56 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
         groupRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
 
         if(fromMessageType.equals("text")){
-            /*messageViewHolder.receiverMessageText.setVisibility(View.GONE);
-            messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
-            messageViewHolder.senderMessageText.setVisibility(View.GONE);*/
-            //getTo();
-            //String target_language=lang;
-//            Default variables for translation
-//            String textToBeTranslated = groupMessages.getMessage();
-//            String TranslatedText;
-//            String source_language;
-//            source_language=Detect(textToBeTranslated);
-//            String languagePair = source_language+"-"+"ar"; // ("<source_language>-<target_language>")
-//            Executing the translation function
-//            TranslatedText=Translate(textToBeTranslated,languagePair);
+            String id = mAuth.getCurrentUser().getUid();
+            userRef = FirebaseDatabase.getInstance().getReference();
+            userRef.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    lang = dataSnapshot.toString();
+                    if(lang.contains("lang_code")){
+                        lang = lang.substring(lang.indexOf("lang_code"));
+                        lang = lang.substring(lang.indexOf("=")+1, lang.indexOf(","));
+                        String target_language = lang;
+                        // Default variables for translation
+                        String textToBeTranslated = groupMessages.getMessage();
+                        String TranslatedText;
+                        String source_language;
+                        source_language=Detect(textToBeTranslated);
+                        String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
+                        // Executing the translation function
+                        TranslatedText=Translate(textToBeTranslated,languagePair);
+                        if(fromUserID.equals(messageSenderID)){
+                            groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
+                            groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
+
+                            groupMessageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
+                            groupMessageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+
+                            groupMessageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
+                            groupMessageViewHolder.senderMessageText.setText(groupMessages.getMessage());
+                            groupMessageViewHolder.senderMessageTime.setText(groupMessages.getTime());
+                        }
+                        else{
+                            groupMessageViewHolder.senderMessageText.setVisibility(View.GONE);
+                            groupMessageViewHolder.senderMessageTime.setVisibility(View.GONE);
+
+                            groupMessageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
+                            groupMessageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+                            groupMessageViewHolder.senderMessageName.setVisibility(View.VISIBLE);
+
+                            groupMessageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
+                            groupMessageViewHolder.receiverMessageText.setText(TranslatedText);
+                            groupMessageViewHolder.senderMessageName.setText(groupMessages.getName());
+                            groupMessageViewHolder.receiverMessageTime.setText(groupMessages.getTime());
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
             if(fromUserID.equals(messageSenderID)){
                 groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
                 groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
@@ -343,23 +380,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
         return finalTimerString;
     }
     private void getTo() {
-        String id = mAuth.getCurrentUser().getUid();
-        userRef = FirebaseDatabase.getInstance().getReference();
-        userRef.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                lang = dataSnapshot.toString();
-                if(lang.contains("lang_code")){
-                    lang = lang.substring(lang.indexOf("lang_code"));
-                    lang = lang.substring(lang.indexOf("=")+1, lang.indexOf(","));
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     //Function for calling executing the Detector Background Task
@@ -407,7 +428,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
 
     public class  groupMessageViewHolder extends RecyclerView.ViewHolder{
         public TextView senderMessageText, receiverMessageText ,receiverMessageTime ,senderMessageTime ,senderMessageName ,senderGroupPlayTime, receiverGroupPlayTime ;
-        public ImageButton receiverImageGroupMessages, senderImageGroupMessages, playVideoGroup, playVideo2Group;;
+        public ImageButton receiverImageGroupMessages, senderImageGroupMessages, playVideoGroup, playVideo2Group;
         public ImageView senderGroupPlayRecord, receiverGroupPlayRecord;
         public VideoView senderGroupVideoMessage, receiverGroupVideoMessage;
         public FrameLayout frameLayoutGroup, frameLayout2Group;
