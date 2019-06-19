@@ -39,7 +39,8 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
     private Context context;
     private boolean entered = true;
     private boolean isPlaying = false;
-    private String lang = "";
+    private String lang = "en";
+    private boolean isLangInit=false;
 
     public groupMessageAdapter(List<groupMessages> groupMessagesList, String groupID, Context context){
         this.groupMessagesList = groupMessagesList;
@@ -79,39 +80,8 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                     if(lang.contains("lang_code")){
                         lang = lang.substring(lang.indexOf("lang_code"));
                         lang = lang.substring(lang.indexOf("=")+1, lang.indexOf(","));
-                        String target_language = lang;
-                        // Default variables for translation
-                        String textToBeTranslated = groupMessages.getMessage();
-                        String TranslatedText;
-                        String source_language;
-                        source_language=Detect(textToBeTranslated);
-                        String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
-                        // Executing the translation function
-                        TranslatedText=Translate(textToBeTranslated,languagePair);
-                        if(fromUserID.equals(messageSenderID)){
-                            groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
-                            groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
+                        isLangInit=true;
 
-                            groupMessageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
-                            groupMessageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
-
-                            groupMessageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-                            groupMessageViewHolder.senderMessageText.setText(groupMessages.getMessage());
-                            groupMessageViewHolder.senderMessageTime.setText(groupMessages.getTime());
-                        }
-                        else{
-                            groupMessageViewHolder.senderMessageText.setVisibility(View.GONE);
-                            groupMessageViewHolder.senderMessageTime.setVisibility(View.GONE);
-
-                            groupMessageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
-                            groupMessageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
-                            groupMessageViewHolder.senderMessageName.setVisibility(View.VISIBLE);
-
-                            groupMessageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                            groupMessageViewHolder.receiverMessageText.setText(TranslatedText);
-                            groupMessageViewHolder.senderMessageName.setText(groupMessages.getName());
-                            groupMessageViewHolder.receiverMessageTime.setText(groupMessages.getTime());
-                        }
                     }
                 }
 
@@ -120,6 +90,11 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
 
                 }
             });
+
+            if(!isLangInit){
+                lang="en";
+            }
+
             if(fromUserID.equals(messageSenderID)){
                 groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
                 groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
@@ -132,6 +107,15 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                 groupMessageViewHolder.senderMessageTime.setText(groupMessages.getTime());
             }
             else{
+                String target_language = lang;
+                // Default variables for translation
+                String textToBeTranslated = groupMessages.getMessage();
+                String TranslatedText;
+                String source_language;
+                source_language=Detect(textToBeTranslated);
+                String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
+                // Executing the translation function
+                TranslatedText=Translate(textToBeTranslated,languagePair);
                 groupMessageViewHolder.senderMessageText.setVisibility(View.GONE);
                 groupMessageViewHolder.senderMessageTime.setVisibility(View.GONE);
 
@@ -140,7 +124,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                 groupMessageViewHolder.senderMessageName.setVisibility(View.VISIBLE);
 
                 groupMessageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                groupMessageViewHolder.receiverMessageText.setText(groupMessages.getMessage());
+                groupMessageViewHolder.receiverMessageText.setText(TranslatedText);
                 groupMessageViewHolder.senderMessageName.setText(groupMessages.getName());
                 groupMessageViewHolder.receiverMessageTime.setText(groupMessages.getTime());
             }
