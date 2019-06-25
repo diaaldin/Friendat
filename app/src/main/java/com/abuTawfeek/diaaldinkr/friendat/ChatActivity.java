@@ -20,6 +20,8 @@ import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,6 +34,8 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -102,9 +106,11 @@ public class ChatActivity extends AppCompatActivity {
     final int REQUEST_PERMISSION_CODE = 1000;
     final int PICK_VIDEO_CODE = 94;
     private MediaPlayer mediaPlayer;
+    private Notification notification;
     private boolean stopped =true;
     private boolean isFABOpen=false ;
-
+    boolean enter = false;
+    private NotificationManagerCompat notificationManager;
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,17 +202,6 @@ public class ChatActivity extends AppCompatActivity {
         /*
         Retrieve the messages from the database
         */
-        rootRef.child("Messages").child(messageSenderID).child(messageReceiverID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
@@ -241,7 +236,7 @@ public class ChatActivity extends AppCompatActivity {
         /*
         Check if the user start to type message
         */
-        final boolean[] enter = {true};
+        //final boolean[] enter = {true};
         messageInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -283,6 +278,104 @@ public class ChatActivity extends AppCompatActivity {
                 checkAndroidVersion();
             }
         });
+        rootRef.child("Message_Notification").child(messageSenderID)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Intent notificationIntent = new Intent(ChatActivity.this, MainActivity.class);
+
+                        PendingIntent pendingIntent = PendingIntent.getActivity(ChatActivity.this, 0,
+                                notificationIntent, 0);
+                        String decrypted = "";
+                        try {
+                            decrypted = AESUtils.decrypt(dataSnapshot.getValue().toString());
+                            Log.d("TEST", "decrypted:" + decrypted);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        notification = new NotificationCompat.Builder(ChatActivity.this, Notifications.CHANNEL_1_ID)
+                                .setSmallIcon(R.drawable.ic_notification)
+                                .setContentTitle("New Message received from "+messageReceiverName)
+                                .setContentText(decrypted)
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                .setContentIntent(pendingIntent)
+                                .build();
+
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        Intent notificationIntent = new Intent(ChatActivity.this, MainActivity.class);
+
+                        PendingIntent pendingIntent = PendingIntent.getActivity(ChatActivity.this, 0,
+                                notificationIntent, 0);
+                        String decrypted = "";
+                        try {
+                            decrypted = AESUtils.decrypt(dataSnapshot.getValue().toString());
+                            Log.d("TEST", "decrypted:" + decrypted);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        notification = new NotificationCompat.Builder(ChatActivity.this, Notifications.CHANNEL_1_ID)
+                                .setSmallIcon(R.drawable.ic_notification)
+                                .setContentTitle("New Message received from "+messageReceiverName)
+                                .setContentText(decrypted)
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                .setContentIntent(pendingIntent)
+                                .build();
+
+                        notificationManager.notify(1, notification);
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        rootRef.child("Message_Notification").child(messageSenderID)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (enter)
+                            notificationManager.notify(1, notification);
+                        else {
+                            enter = true;
+
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        enter = false;
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
     private void showFABMenu(){
 
@@ -629,11 +722,14 @@ public class ChatActivity extends AppCompatActivity {
             messageBodyDetails.put(messageSenderRef + "/"+ messagePushID , messageTextBody);
             messageBodyDetails.put(messageReceiverRef + "/"+ messagePushID , messageTextBody);
 
+            final String finalEncrypted = encrypted;
             rootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if(task.isSuccessful()){
-                        Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                        Map notificationBody = new HashMap();
+                        notificationBody.put("message", finalEncrypted);
+                        rootRef.child("Message_Notification").child(messageReceiverID).updateChildren(notificationBody);
                     }else{
                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
@@ -652,6 +748,7 @@ public class ChatActivity extends AppCompatActivity {
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionBarView = layoutInflater.inflate(R.layout.custom_chat_bar, null);
         actionBar.setCustomView(actionBarView);
+        notificationManager = NotificationManagerCompat.from(this);
         //initialize the fields
         userImage = findViewById(R.id.custom_profile_image);
         userName = findViewById(R.id.custom_profile_name);

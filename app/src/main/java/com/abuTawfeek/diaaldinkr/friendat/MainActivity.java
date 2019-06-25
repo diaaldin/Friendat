@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference rootRef;
 
     private String currentUserID;
+    private NotificationManagerCompat notificationManager;
 
 
     @Override
@@ -55,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
         myTabLayout=findViewById(R.id.main_tabs);
         myTabLayout.setupWithViewPager(myViewPager);
+        notificationManager = NotificationManagerCompat.from(this);
 
+        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
