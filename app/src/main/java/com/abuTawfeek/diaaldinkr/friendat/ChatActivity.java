@@ -609,10 +609,17 @@ public class ChatActivity extends AppCompatActivity {
             SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
             saveCurrentTime = currentTime.format(calendar.getTime());
             Map messageTextBody = new HashMap();
+
+            String encrypted = "";
+            try {
+                encrypted = AESUtils.encrypt(messageText);
+                Log.d("TEST", "encrypted:" + encrypted);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             /**************************************************************************************/
             /**************************************************************************************/
-            messageTextBody.put("message",messageText);
-            //this is the message type and the text for just text messages i had to add another types
+            messageTextBody.put("message", encrypted);
             messageTextBody.put("type","text");
             messageTextBody.put("from",messageSenderID);
             messageTextBody.put("to",messageReceiverLangCode);

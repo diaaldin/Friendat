@@ -93,7 +93,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             String target_language=messages.getTo();
             //Default variables for translation
-            String textToBeTranslated = messages.getMessage();
+            String decrypted = "";
+            try {
+                decrypted = AESUtils.decrypt(messages.getMessage());
+                Log.d("TEST", "decrypted:" + decrypted);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String textToBeTranslated = decrypted;
             String TranslatedText;
             String source_language;
             source_language=Detect(textToBeTranslated);
@@ -113,7 +120,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderTranslatedMessageText.setBackgroundResource(R.drawable.sender_translated_message_layout);
-                messageViewHolder.senderMessageText.setText(messages.getMessage());
+                messageViewHolder.senderMessageText.setText(decrypted);
                 messageViewHolder.senderTranslatedMessageText.setText(TranslatedText);
                 messageViewHolder.senderMessageTime.setText(messages.getTime());
             }
@@ -132,7 +139,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 /**********************>  change the to translate        */
                 messageViewHolder.receiverMessageText.setText(messages.getMessage());
                 messageViewHolder.receiverMessageText.setText(TranslatedText);
-                messageViewHolder.receiverTranslatedMessageText.setText(messages.getMessage());
+                messageViewHolder.receiverTranslatedMessageText.setText(decrypted);
                 messageViewHolder.receiverMessageTime.setText(messages.getTime());
             }
         }else if(fromMessageType.equals("image")){

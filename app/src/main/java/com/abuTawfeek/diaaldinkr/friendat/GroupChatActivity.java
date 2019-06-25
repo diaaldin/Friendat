@@ -32,6 +32,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -433,14 +434,22 @@ public class GroupChatActivity extends AppCompatActivity {
             groupIdRef.updateChildren(groupMessageKey);
 
             groupMessageKeyRef = groupIdRef.child("user_messages").child(messageKey);
+            String encrypted = "";
+            try {
+                encrypted = AESUtils.encrypt(message);
+                Log.d("TEST", "encrypted:" + encrypted);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             HashMap<String,Object> messageInfoMap = new HashMap<>();
             messageInfoMap.put("name",currentUserName);
             messageInfoMap.put("sender_id",currentUserID);
             //here i have to encrypt the message
-            messageInfoMap.put("message",message);
+            messageInfoMap.put("message",encrypted);
             messageInfoMap.put("time",currentTime);
             messageInfoMap.put("type","text");
+
             groupMessageKeyRef.updateChildren(messageInfoMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -460,54 +469,8 @@ public class GroupChatActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         linearLayoutManager.setStackFromEnd(true);
-        /*groupIdRef.child("user_messages").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(dataSnapshot.exists()){
-                    //if the group exists and display the messages
-                    DisplayMessages(dataSnapshot);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if(dataSnapshot.exists()){
-                    //if the group exists and display the messages
-                    DisplayMessages(dataSnapshot);
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
     }
 
-    /*private void DisplayMessages(DataSnapshot dataSnapshot) {
-//retrieve and display all the messages
-        Iterator iter = dataSnapshot.getChildren().iterator();
-        while (iter.hasNext()){
-            String chatDate = (String)((DataSnapshot)iter.next()).getValue();
-            //Here i had to decrypt the message
-            String chatMessage = (String)((DataSnapshot)iter.next()).getValue();
-            String chatName = (String)((DataSnapshot)iter.next()).getValue();
-            String chatTime = (String)((DataSnapshot)iter.next()).getValue();
-
-            displayTextMessage.append(chatName + ": \n"+ chatMessage + "\n"+chatTime+"      "+chatDate+"\n\n\n");
-
-        }
-    }*/
 
     private void InitializeFields() {
         groupToolBar = findViewById(R.id.group_toolbar);

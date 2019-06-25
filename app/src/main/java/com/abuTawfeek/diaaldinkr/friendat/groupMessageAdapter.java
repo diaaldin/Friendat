@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
     private Context context;
     private boolean entered = true;
     private boolean isPlaying = false;
-    private String lang = "en";
+    private String lang = "";
     private boolean isLangInit=false;
 
     public groupMessageAdapter(List<groupMessages> groupMessagesList, String groupID, Context context){
@@ -54,7 +55,29 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.custom_group_message_layout, viewGroup , false);
         mAuth = FirebaseAuth.getInstance();
+        String id = mAuth.getCurrentUser().getUid();
+        userRef = FirebaseDatabase.getInstance().getReference();
+        userRef.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                lang = dataSnapshot.toString();
+                if(lang.contains("lang_code")){
+                    lang = lang.substring(lang.indexOf("lang_code"));
+                    lang = lang.substring(lang.indexOf("=")+1, lang.indexOf(","));
+                    isLangInit=true;
 
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        if(!isLangInit){
+            lang="en";
+        }
         return new groupMessageViewHolder(view);
     }
 
@@ -71,30 +94,13 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
         groupRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
 
         if(fromMessageType.equals("text")){
-            String id = mAuth.getCurrentUser().getUid();
-            userRef = FirebaseDatabase.getInstance().getReference();
-            userRef.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    lang = dataSnapshot.toString();
-                    if(lang.contains("lang_code")){
-                        lang = lang.substring(lang.indexOf("lang_code"));
-                        lang = lang.substring(lang.indexOf("=")+1, lang.indexOf(","));
-                        isLangInit=true;
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-            if(!isLangInit){
-                lang="en";
+            String decrypted = "";
+            try {
+                decrypted = AESUtils.decrypt(groupMessages.getMessage());
+                Log.d("TEST", "decrypted:" + decrypted);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
             if(fromUserID.equals(messageSenderID)){
                 groupMessageViewHolder.receiverMessageText.setVisibility(View.GONE);
                 groupMessageViewHolder.receiverMessageTime.setVisibility(View.GONE);
@@ -103,19 +109,23 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                 groupMessageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
 
                 groupMessageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-                groupMessageViewHolder.senderMessageText.setText(groupMessages.getMessage());
+                groupMessageViewHolder.senderMessageText.setText(decrypted);
                 groupMessageViewHolder.senderMessageTime.setText(groupMessages.getTime());
             }
             else{
                 String target_language = lang;
                 // Default variables for translation
-                String textToBeTranslated = groupMessages.getMessage();
+                String textToBeTranslated = decrypted;
                 String TranslatedText;
                 String source_language;
                 source_language=Detect(textToBeTranslated);
                 String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
                 // Executing the translation function
-                TranslatedText=Translate(textToBeTranslated,languagePair);
+                try {
+                    TranslatedText=Translate(textToBeTranslated,languagePair);
+                }catch (NullPointerException e){
+                    TranslatedText = decrypted;
+                }
                 groupMessageViewHolder.senderMessageText.setVisibility(View.GONE);
                 groupMessageViewHolder.senderMessageTime.setVisibility(View.GONE);
 

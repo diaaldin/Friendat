@@ -52,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
     private StorageReference userProfileImagesRef;
     private ProgressDialog loadingBar;
     private Spinner spinner;
-    private  Uri resultUri = Uri.parse("android.resource://com.example.diaaldinkr.friendat2/drawable/profile_image");
+    private  Uri resultUri ;
     private boolean pick = false;
 
     @Override
