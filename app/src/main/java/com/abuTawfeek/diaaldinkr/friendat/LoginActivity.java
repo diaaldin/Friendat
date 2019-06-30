@@ -46,6 +46,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        ForgetPasswordLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendUserToForgetPasswordActivity();
+            }
+        });
+
         LoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,5 +137,9 @@ public class LoginActivity extends AppCompatActivity {
     private void sendUserToRegisterActivity() {
         Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(registerIntent);
+    }
+    private void sendUserToForgetPasswordActivity() {
+        Intent ForgetPasswordIntent = new Intent(LoginActivity.this, resetPasswordActivity.class);
+        startActivity(ForgetPasswordIntent);
     }
 }
