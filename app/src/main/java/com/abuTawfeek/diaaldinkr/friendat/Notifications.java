@@ -1,3 +1,8 @@
+/*
+    In this class i defined to channels of notification
+    1. chat message receiving
+    2. char requests receiving
+*/
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.app.Application;

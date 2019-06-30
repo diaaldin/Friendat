@@ -1,3 +1,8 @@
+/*
+In this activity i represent all the user settings
+like name ,status ,picture and the language that the user
+speak.
+*/
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.Manifest;
@@ -37,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsActivity extends AppCompatActivity {

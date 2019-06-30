@@ -1,3 +1,8 @@
+/*
+  In this class I implements an AES algorithm to encrypt and decrypt
+  all the messages that pass between the users
+ */
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import javax.crypto.Cipher;

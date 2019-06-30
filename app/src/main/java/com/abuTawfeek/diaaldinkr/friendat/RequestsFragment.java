@@ -1,5 +1,8 @@
-package com.abuTawfeek.diaaldinkr.friendat;
+/*
+In this class I display all the requests for the users from the database
+*/
 
+package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,10 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import de.hdodenhof.circleimageview.CircleImageView;
-
-
 /**
  * A simple {@link Fragment} subclass.
  */

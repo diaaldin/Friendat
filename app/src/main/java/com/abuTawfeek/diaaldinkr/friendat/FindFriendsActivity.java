@@ -1,3 +1,8 @@
+/*
+In this activity I retrieve all the users in the database and display them
+in the activity
+*/
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.content.Intent;

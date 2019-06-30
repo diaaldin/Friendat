@@ -1,3 +1,8 @@
+/*
+In this activity I create a log in using phone number
+with the firebase authentication
+*/
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.app.ProgressDialog;

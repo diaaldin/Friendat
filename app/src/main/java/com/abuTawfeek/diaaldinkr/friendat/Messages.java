@@ -1,3 +1,5 @@
+/* This Model is to define all the attributes of the message
+ */
 package com.abuTawfeek.diaaldinkr.friendat;
 
 public class Messages {

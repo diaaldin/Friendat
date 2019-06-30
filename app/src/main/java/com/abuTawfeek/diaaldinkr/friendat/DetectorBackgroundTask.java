@@ -1,9 +1,13 @@
+/*
+This is AsyncTask class that usr to send http request to Yandex Api
+to detect what the language for the messages that the user send
+*/
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

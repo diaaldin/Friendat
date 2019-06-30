@@ -1,5 +1,6 @@
 
-// This class is to define all the attributes of user contacts
+/* This Model is to define all the attributes of user contacts
+*/
 package com.abuTawfeek.diaaldinkr.friendat;
 
 public class Contacts {

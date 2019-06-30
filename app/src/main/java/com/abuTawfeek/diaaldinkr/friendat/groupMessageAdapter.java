@@ -1,3 +1,8 @@
+/*
+This adapter class is used to manage the RecyclerView "the list"
+data un the group chat activity
+*/
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.content.Context;

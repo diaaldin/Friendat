@@ -1,9 +1,12 @@
+/*
+This class is a service that used to send notification in the background
+ */
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 

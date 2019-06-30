@@ -1,3 +1,9 @@
+/*
+    In this Activity create video viewer to open the video when we click on it
+    the activity receive the URI of the video from the chat or group activity
+    and display it on the screen
+ */
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.media.MediaPlayer;

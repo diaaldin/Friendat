@@ -1,6 +1,7 @@
 /*
     In this Activity create image viewer to open the image when we click on it
-    the activity receive the URI of the image from the chat activity and display it on the screen
+    the activity receive the URI of the image from the chat or group activity
+    and display it on the screen
     using Picasso library
  */
 

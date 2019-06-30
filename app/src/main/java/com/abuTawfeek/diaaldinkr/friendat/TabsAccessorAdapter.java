@@ -1,3 +1,8 @@
+/*
+This class is used to display the tabs in the main screen in the application
+tabs : chats ,groups ,contacts and requests.
+*/
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.support.annotation.Nullable;

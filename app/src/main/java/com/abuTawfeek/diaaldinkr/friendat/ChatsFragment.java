@@ -1,7 +1,9 @@
 
 
-/* This class is used for retrieve and display all the chats from the firebase storage
+/* This class is used for retrieve and display all the chats with the friends
+    from the firebase storage
 */
+
 package com.abuTawfeek.diaaldinkr.friendat;
 
 import android.content.Intent;
