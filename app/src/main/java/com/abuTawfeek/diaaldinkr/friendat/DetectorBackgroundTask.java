@@ -64,7 +64,6 @@ public class DetectorBackgroundTask extends AsyncTask<String, Void, String>{
             resultString = resultString.substring(resultString.indexOf("\"")+1);
             resultString = resultString.substring(0,resultString.indexOf("\""));
 
-            Log.d("Detection Result:", resultString);
             return resultString;
 
         } catch (MalformedURLException e) {

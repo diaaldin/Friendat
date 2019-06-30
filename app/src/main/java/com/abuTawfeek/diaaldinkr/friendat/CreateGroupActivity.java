@@ -104,7 +104,6 @@ public class CreateGroupActivity extends AppCompatActivity {
                     groupChatIntent.putExtra("group_name",groupName);
                     groupChatIntent.putExtra("group_id",groupPushID);
                     groupChatIntent.putExtra("group_image", resultUri);
-                    Log.d(">>>", "onClick: 11"+resultUri);
                     startActivity(groupChatIntent);
                 }
             }

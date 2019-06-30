@@ -437,7 +437,6 @@ public class GroupChatActivity extends AppCompatActivity {
             String encrypted = "";
             try {
                 encrypted = AESUtils.encrypt(message);
-                Log.d("TEST", "encrypted:" + encrypted);
             } catch (Exception e) {
                 e.printStackTrace();
             }

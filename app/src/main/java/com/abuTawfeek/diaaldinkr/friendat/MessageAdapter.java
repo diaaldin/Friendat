@@ -96,7 +96,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             String decrypted = "";
             try {
                 decrypted = AESUtils.decrypt(messages.getMessage());
-                Log.d("TEST", "decrypted:" + decrypted);
             } catch (Exception e) {
                 e.printStackTrace();
             }

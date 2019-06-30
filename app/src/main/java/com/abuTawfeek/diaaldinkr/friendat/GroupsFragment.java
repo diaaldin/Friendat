@@ -82,7 +82,6 @@ public class GroupsFragment extends Fragment {
                                     int i= temp.indexOf("=");
                                     groupPushID = temp.substring(1,i);*/
                                     final String groupName = dataSnapshot.child("group_name").getValue().toString();
-                                    Log.d(">>>", "onCreateView: " + groupName);
                                     holder.groupName.setText(groupName);
                                     groupMembersRef.child(groupIDs).child("group_members").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override

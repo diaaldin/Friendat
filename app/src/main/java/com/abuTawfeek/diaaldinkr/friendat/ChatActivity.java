@@ -289,7 +289,6 @@ public class ChatActivity extends AppCompatActivity {
                         String decrypted = "";
                         try {
                             decrypted = AESUtils.decrypt(dataSnapshot.getValue().toString());
-                            Log.d("TEST", "decrypted:" + decrypted);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -313,7 +312,6 @@ public class ChatActivity extends AppCompatActivity {
                         String decrypted = "";
                         try {
                             decrypted = AESUtils.decrypt(dataSnapshot.getValue().toString());
-                            Log.d("TEST", "decrypted:" + decrypted);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -706,7 +704,6 @@ public class ChatActivity extends AppCompatActivity {
             String encrypted = "";
             try {
                 encrypted = AESUtils.encrypt(messageText);
-                Log.d("TEST", "encrypted:" + encrypted);
             } catch (Exception e) {
                 e.printStackTrace();
             }
