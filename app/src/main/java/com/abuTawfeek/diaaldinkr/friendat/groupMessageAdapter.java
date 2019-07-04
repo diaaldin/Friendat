@@ -123,7 +123,11 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                 String textToBeTranslated = decrypted;
                 String TranslatedText;
                 String source_language;
-                source_language=Detect(textToBeTranslated);
+                try {
+                    source_language=Detect(textToBeTranslated);
+                }catch (NullPointerException e){
+                    source_language = "en";
+                }
                 String languagePair = source_language+"-"+target_language; // ("<source_language>-<target_language>")
                 // Executing the translation function
                 try {
@@ -308,7 +312,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
 
                 final Intent videoViewerIntent = new Intent(context.getApplicationContext(),VideoViewer.class);
                 videoViewerIntent.putExtra("video",groupMessages.getMessage());
-                videoViewerIntent.putExtra("sender_id",fromUserID);
+                videoViewerIntent.putExtra("sender_id",fromUserName);
                 videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 groupMessageViewHolder.senderGroupVideoMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -339,7 +343,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
                 groupMessageViewHolder.receiverGroupVideoMessage.seekTo( 1 );
                 final Intent videoViewerIntent = new Intent(context.getApplicationContext(),VideoViewer.class);
                 videoViewerIntent.putExtra("video",groupMessages.getMessage());
-                videoViewerIntent.putExtra("sender_id",fromUserID);
+                videoViewerIntent.putExtra("sender_id",fromUserName);
                 videoViewerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 groupMessageViewHolder.receiverGroupVideoMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -385,12 +389,12 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
     //Function for calling executing the Detector Background Task
     private String Detect(String textToBeDetected){
         DetectorBackgroundTask detectorBackgroundTask= new DetectorBackgroundTask(context);
-        String translationResult = null; // Returns the translated text as a String
+        String detectionResult = null; // Returns the detection language code as a String
         try {
-            translationResult = detectorBackgroundTask.execute(textToBeDetected).get();
+            detectionResult = detectorBackgroundTask.execute(textToBeDetected).get();
             try {
-                final JSONObject translationResultObj = new JSONObject(translationResult);
-                translationResult=translationResultObj.get("text").toString();
+                final JSONObject translationResultObj = new JSONObject(detectionResult);
+                detectionResult=translationResultObj.get("text").toString();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -399,7 +403,7 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return translationResult;
+        return detectionResult;
     }
     //Function for calling executing the Translator Background Task
     private String Translate(String textToBeTranslated,String languagePair){
@@ -417,6 +421,8 @@ public class groupMessageAdapter extends RecyclerView.Adapter<groupMessageAdapte
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            translationResult = textToBeTranslated;
         }
         return translationResult;
     }

@@ -45,7 +45,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -473,7 +472,7 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+
                             } else {
                                 Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                             }
@@ -595,7 +594,7 @@ public class ChatActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+
                                     } else {
                                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                     }
@@ -648,7 +647,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(ChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+
                                 } else {
                                     Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                 }

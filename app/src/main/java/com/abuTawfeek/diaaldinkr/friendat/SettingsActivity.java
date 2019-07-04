@@ -228,7 +228,6 @@ public class SettingsActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                Toast.makeText(SettingsActivity.this, "Image saved in the database", Toast.LENGTH_SHORT).show();
                                                 pick=false;
                                             } else {
                                                 userName.setVisibility(View.VISIBLE);

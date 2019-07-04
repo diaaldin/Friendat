@@ -422,12 +422,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         //Function for calling executing the Detector Background Task
     private String Detect(String textToBeDetected){
         DetectorBackgroundTask detectorBackgroundTask= new DetectorBackgroundTask(context);
-        String translationResult = null; // Returns the translated text as a String
+        String detectionResult = null; // Returns the detection language code as a String
         try {
-            translationResult = detectorBackgroundTask.execute(textToBeDetected).get();
+            detectionResult = detectorBackgroundTask.execute(textToBeDetected).get();
             try {
-                final JSONObject translationResultObj = new JSONObject(translationResult);
-                translationResult=translationResultObj.get("text").toString();
+                final JSONObject translationResultObj = new JSONObject(detectionResult);
+                detectionResult=translationResultObj.get("text").toString();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -435,8 +435,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            detectionResult = "en";
         }
-        return translationResult;
+        return detectionResult;
     }
     //Function for calling executing the Translator Background Task
     private String Translate(String textToBeTranslated,String languagePair){
@@ -454,6 +456,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            translationResult = textToBeTranslated;
         }
         return translationResult;
     }

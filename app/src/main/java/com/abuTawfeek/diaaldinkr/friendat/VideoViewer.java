@@ -38,20 +38,10 @@ public class VideoViewer extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         final String videoURI = getIntent().getExtras().get("video").toString();
-        String senderId = getIntent().getExtras().get("sender_id").toString();
-        usersRef.child(senderId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-               video.setVideoURI(Uri.parse(videoURI));
-               video.seekTo( 1 );
-                getSupportActionBar().setTitle(dataSnapshot.child("name").getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        String senderName = getIntent().getExtras().get("sender_id").toString();
+        video.setVideoURI(Uri.parse(videoURI));
+        video.seekTo( 1 );
+        getSupportActionBar().setTitle(senderName);
         playVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

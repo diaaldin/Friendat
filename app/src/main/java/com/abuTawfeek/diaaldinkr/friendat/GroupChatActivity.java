@@ -32,7 +32,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,7 +39,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -452,9 +450,8 @@ public class GroupChatActivity extends AppCompatActivity {
             groupMessageKeyRef.updateChildren(messageInfoMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    userMessageInput.setText("");
                     if(task.isSuccessful()){
-                        Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                        userMessageInput.setText("");
                     }else{
                         Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
@@ -571,10 +568,9 @@ public class GroupChatActivity extends AppCompatActivity {
                             groupMessageKeyRef2.updateChildren(messageTextBody).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    userMessageInput.setText("");
-                                    add.performClick();
                                     if(task.isSuccessful()){
-                                        Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                                        userMessageInput.setText("");
+                                        add.performClick();
                                     }else{
                                         Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                     }
@@ -618,9 +614,8 @@ public class GroupChatActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 userMessageInput.setText("");
-                                add.performClick();
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(GroupChatActivity.this, "message sent", Toast.LENGTH_SHORT).show();
+                                    add.performClick();
                                 } else {
                                     Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                 }

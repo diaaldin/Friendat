@@ -1,5 +1,7 @@
 package com.abuTawfeek.diaaldinkr.friendat;
-
+/*
+In this activity i add the reset password feature to the app
+*/
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -47,7 +49,7 @@ public class resetPasswordActivity extends AppCompatActivity {
                 }
 
                 progressBar.setVisibility(View.VISIBLE);
-                // Toast.makeText(ResetPasswordActivity.this,auth.getCurrentUser(), Toast.LENGTH_LONG).show();
+
                 auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override

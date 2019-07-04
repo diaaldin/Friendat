@@ -1,8 +1,10 @@
 package com.abuTawfeek.diaaldinkr.friendat;
-
+/*
+In this Activity i retrieve and display all the chats from the database and i create the menu
+and the nav bar and also update the user status offline or online
+*/
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
@@ -10,10 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +19,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -100,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //if the user is not a new user and he update his profile
                 if(dataSnapshot.child("name").exists()){
-                    Toast.makeText(MainActivity.this,"Welcome",Toast.LENGTH_SHORT).show();
+
                 }
                 else{
                     //if the user is a new user and send the user to update his profile
@@ -157,55 +154,7 @@ public class MainActivity extends AppCompatActivity {
         Intent createGroupIntent = new Intent(MainActivity.this,CreateGroupActivity.class);
         startActivity(createGroupIntent);
     }
-    /*private void requestNewGroup() {
-        //in this method I take the name of the group and store it in the database
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
-        builder.setTitle("Enter group name :");
-        //create edit text to get the group name
-        final EditText groupNameField = new EditText(MainActivity.this);
-        groupNameField.setHint("e.g family");
-        builder.setView(groupNameField);
-        //Create button create in the dialog
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //if the user click on create the group will store in the data base
-                String groupName = groupNameField.getText().toString();
-                if(TextUtils.isEmpty(groupName)){
-                    Toast.makeText(MainActivity.this,"Please enter the group name !",Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    //store the group in the database
-                    createNewGroup(groupName);
-                }
-            }
-        });
-        //Create button create in the dialog
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //if the user click on cancel the dialog will closed
-                dialogInterface.cancel();
-            }
-        });
 
-        builder.show();
-
-    }*/
-
-    private void createNewGroup(final String groupName) {
-        //In this method I store the group in the database
-        rootRef.child("Groups").child(groupName).setValue("")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            //if the group add successfully
-                            Toast.makeText(MainActivity.this,"The Group "+groupName+" is created successfully",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
     private void sendUserToFindFriendsActivity() {
         Intent findFriendsIntent = new Intent(MainActivity.this,FindFriendsActivity.class);
         startActivity(findFriendsIntent);
